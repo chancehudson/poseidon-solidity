@@ -409,12 +409,17 @@ contract Poseidon {
       0x102adf8ef74735a27e9128306dcbc3c99f6f7291cd406578ce14ea2adaba68f8
     );
 
-    (state0, state1, state2) = hashFRound(state0, state1, state2,
-      0x0fe0af7858e49859e2a54d6f1ad945b1316aa24bfbdd23ae40a6d0cb70c3eab1,
-      0x216f6717bbc7dedb08536a2220843f4e2da5f1daa9ebdefde8a5ea7344798d22,
-      0x1da55cc900f0d21f4a3e694391918a1b3c23b2ac773c6b3ef88e2e4228325161
-    );
-    return state0;
+    // final round can be short circuited
+
+    state0 = addmod(state0, 0x0fe0af7858e49859e2a54d6f1ad945b1316aa24bfbdd23ae40a6d0cb70c3eab1, F);
+    state1 = addmod(state1, 0x216f6717bbc7dedb08536a2220843f4e2da5f1daa9ebdefde8a5ea7344798d22, F);
+    state2 = addmod(state2, 0x1da55cc900f0d21f4a3e694391918a1b3c23b2ac773c6b3ef88e2e4228325161, F);
+
+    state0 = mulmod(mulmod(mulmod(state0, state0, F), mulmod(state0, state0, F), F), state0, F);
+    state1 = mulmod(mulmod(mulmod(state1, state1, F), mulmod(state1, state1, F), F), state1, F);
+    state2 = mulmod(mulmod(mulmod(state2, state2, F), mulmod(state2, state2, F), F), state2, F);
+
+    return addmod(addmod(mulmod(state0, M00, F), mulmod(state1, M10, F), F), mulmod(state2, M20, F), F);
   }
 
   function hashFRound(

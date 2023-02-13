@@ -12,7 +12,9 @@ uint state1 = inputs[0];
 uint state2 = inputs[1];
 `
 
-for (let r = 0; r < ROUNDS_F + ROUNDS_P; r++) {
+let r = 0
+
+for (; r < ROUNDS_F + ROUNDS_P - 1; r++) {
   const func = r < ROUNDS_F / 2 || r >= ROUNDS_F / 2 + ROUNDS_P ? 'hashFRound' : 'hashPRound'
   f += `
 (state0, state1, state2) = ${func}(state0, state1, state2,
@@ -23,7 +25,18 @@ for (let r = 0; r < ROUNDS_F + ROUNDS_P; r++) {
 `
 }
 
-f += `return state0;`
+f += `
+
+state0 = addmod(state0, ${C[r*T]}, F);
+state1 = addmod(state1, ${C[r*T+1]}, F);
+state2 = addmod(state2, ${C[r*T+2]}, F);
+
+state0 = mulmod(mulmod(mulmod(state0, state0, F), mulmod(state0, state0, F), F), state0, F);
+state1 = mulmod(mulmod(mulmod(state1, state1, F), mulmod(state1, state1, F), F), state1, F);
+state2 = mulmod(mulmod(mulmod(state2, state2, F), mulmod(state2, state2, F), F), state2, F);
+
+return addmod(addmod(mulmod(state0, M00, F), mulmod(state1, M10, F), F), mulmod(state2, M20, F), F);
+`
 
 console.log(f)
 
