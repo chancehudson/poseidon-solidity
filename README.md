@@ -12,6 +12,6 @@ npm test
 ## Benchmark
 
 ```js
-solidity - 86337 gas
+solidity - 31018 gas
 iden3 opcodes - 32226 gas
 ```
