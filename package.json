@@ -1,0 +1,19 @@
+{
+  "name": "poseidon-sol",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "hardhat compile",
+    "test": "hardhat test"
+  },
+  "author": "vimwitch",
+  "license": "MIT",
+  "devDependencies": {
+    "@nomiclabs/hardhat-ethers": "^2.2.2",
+    "big-integer": "^1.6.51",
+    "circomlibjs": "^0.0.8",
+    "hardhat": "^2.12.7",
+    "poseidon-lite": "^0.0.2"
+  }
+}
