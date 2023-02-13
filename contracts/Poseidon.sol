@@ -30,28 +30,36 @@ contract Poseidon {
       ]
     ];
 
-    uint[3] memory state = [0, inputs[0], inputs[1]];
-    uint[3] memory swap = [0, inputs[0], inputs[1]];
+    uint state0 = 0;
+    uint state1 = inputs[0];
+    uint state2 = inputs[1];
+    uint swap0 = 0;
+    uint swap1 = inputs[0];
+    uint swap2 = inputs[1];
     uint v = 0;
     for (uint8 r = 0; r < ROUNDS_F + ROUNDS_P; r++) {
-      state[0] = addmod(swap[0], C[r * T + 0], F);
-      state[1] = addmod(swap[1], C[r * T + 1], F);
-      state[2] = addmod(swap[2], C[r * T + 2], F);
+      state0 = addmod(swap0, C[r * T + 0], F);
+      state1 = addmod(swap1, C[r * T + 1], F);
+      state2 = addmod(swap2, C[r * T + 2], F);
 
-      state[0] = pow5mod(state[0]);
+      state0 = pow5mod(state0);
       if (r < ROUNDS_F / 2 || r >= ROUNDS_F / 2 + ROUNDS_P) {
-        state[1] = pow5mod(state[1]);
-        state[2] = pow5mod(state[2]);
+        state1 = pow5mod(state1);
+        state2 = pow5mod(state2);
       }
 
-      for (uint8 x = 0; x < T; x++) {
-        v = addmod(0, mulmod(state[0], M[0][x], F), F);
-        v = addmod(v, mulmod(state[1], M[1][x], F), F);
-        swap[x] = addmod(v, mulmod(state[2], M[2][x], F), F);
-      }
+      v = addmod(0, mulmod(state0, M[0][0], F), F);
+      v = addmod(v, mulmod(state1, M[1][0], F), F);
+      swap0 = addmod(v, mulmod(state2, M[2][0], F), F);
+      v = addmod(0, mulmod(state0, M[0][1], F), F);
+      v = addmod(v, mulmod(state1, M[1][1], F), F);
+      swap1 = addmod(v, mulmod(state2, M[2][1], F), F);
+      v = addmod(0, mulmod(state0, M[0][2], F), F);
+      v = addmod(v, mulmod(state1, M[1][2], F), F);
+      swap2 = addmod(v, mulmod(state2, M[2][2], F), F);
     }
     console.log(g - gasleft());
-    return swap[0];
+    return swap0;
   }
 
   function pow5mod(uint i) public pure returns (uint) {
