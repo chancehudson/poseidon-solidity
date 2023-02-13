@@ -9,7 +9,7 @@ describe('Poseidon', function () {
     const [owner] = await ethers.getSigners()
     const Poseidon = await ethers.getContractFactory('Poseidon')
     const _poseidon = await Poseidon.deploy()
-    const h = await _poseidon.hash([0,1])
+    const h = await _poseidon.hashBenchmark([0,1])
     assert.equal(h.toString(), poseidon([0, 1]).toString())
     assert.equal(h.toString(), poseidon_slow([0, 1]).toString())
   })
