@@ -53,9 +53,10 @@ contract Poseidon {
       state1 = addmod(swap1, C[r * T + 1], F);
       state2 = addmod(swap2, C[r * T + 2], F);
 
-      state0 = pow5mod(state0);
-      state1 = pow5mod(state1);
-      state2 = pow5mod(state2);
+      // these are single line pow5mod calls, see the function below
+      state0 = mulmod(mulmod(mulmod(state0, state0, F), mulmod(state0, state0, F), F), state0, F);
+      state1 = mulmod(mulmod(mulmod(state1, state1, F), mulmod(state1, state1, F), F), state1, F);
+      state2 = mulmod(mulmod(mulmod(state2, state2, F), mulmod(state2, state2, F), F), state2, F);
 
       swap0 = addmod(addmod(mulmod(state0, M00, F), mulmod(state1, M10, F), F), mulmod(state2, M20, F), F);
       swap1 = addmod(addmod(mulmod(state0, M01, F), mulmod(state1, M11, F), F), mulmod(state2, M21, F), F);
@@ -66,7 +67,7 @@ contract Poseidon {
       state1 = addmod(swap1, C[r * T + 1], F);
       state2 = addmod(swap2, C[r * T + 2], F);
 
-      state0 = pow5mod(state0);
+      state0 = mulmod(mulmod(mulmod(state0, state0, F), mulmod(state0, state0, F), F), state0, F);
 
       swap0 = addmod(addmod(mulmod(state0, M00, F), mulmod(state1, M10, F), F), mulmod(state2, M20, F), F);
       swap1 = addmod(addmod(mulmod(state0, M01, F), mulmod(state1, M11, F), F), mulmod(state2, M21, F), F);
@@ -77,9 +78,9 @@ contract Poseidon {
       state1 = addmod(swap1, C[r * T + 1], F);
       state2 = addmod(swap2, C[r * T + 2], F);
 
-      state0 = pow5mod(state0);
-      state1 = pow5mod(state1);
-      state2 = pow5mod(state2);
+      state0 = mulmod(mulmod(mulmod(state0, state0, F), mulmod(state0, state0, F), F), state0, F);
+      state1 = mulmod(mulmod(mulmod(state1, state1, F), mulmod(state1, state1, F), F), state1, F);
+      state2 = mulmod(mulmod(mulmod(state2, state2, F), mulmod(state2, state2, F), F), state2, F);
 
       swap0 = addmod(addmod(mulmod(state0, M00, F), mulmod(state1, M10, F), F), mulmod(state2, M20, F), F);
       swap1 = addmod(addmod(mulmod(state0, M01, F), mulmod(state1, M11, F), F), mulmod(state2, M21, F), F);
