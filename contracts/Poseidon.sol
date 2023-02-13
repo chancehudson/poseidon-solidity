@@ -26,7 +26,7 @@ contract Poseidon {
   function extBenchmark(address p) public view returns (uint) {
     uint g = gasleft();
     uint r = Poseidon2(p).poseidon([uint(2), 1]);
-    console.log("iden2 impl", g - gasleft());
+    console.log("iden3 impl", g - gasleft());
     return r;
   }
 
