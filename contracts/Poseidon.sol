@@ -31,32 +31,27 @@ contract Poseidon {
     ];
 
     uint[3] memory state = [0, inputs[0], inputs[1]];
-    uint[3] memory swap = [0, 0, uint(0)];
+    uint[3] memory swap = [0, inputs[0], inputs[1]];
+    uint v = 0;
     for (uint8 r = 0; r < ROUNDS_F + ROUNDS_P; r++) {
-      state[0] = addmod(state[0], C[r * T + 0], F);
-      state[1] = addmod(state[1], C[r * T + 1], F);
-      state[2] = addmod(state[2], C[r * T + 2], F);
+      state[0] = addmod(swap[0], C[r * T + 0], F);
+      state[1] = addmod(swap[1], C[r * T + 1], F);
+      state[2] = addmod(swap[2], C[r * T + 2], F);
+
+      state[0] = pow5mod(state[0]);
       if (r < ROUNDS_F / 2 || r >= ROUNDS_F / 2 + ROUNDS_P) {
-        state[0] = pow5mod(state[0]);
         state[1] = pow5mod(state[1]);
         state[2] = pow5mod(state[2]);
-      } else {
-        state[0] = pow5mod(state[0]);
       }
 
       for (uint8 x = 0; x < T; x++) {
-        uint v = 0;
-        for (uint8 y = 0; y < T; y++) {
-          v = addmod(v, mulmod(state[y], M[y][x], F), F);
-        }
-        swap[x] = v;
+        v = addmod(0, mulmod(state[0], M[0][x], F), F);
+        v = addmod(v, mulmod(state[1], M[1][x], F), F);
+        swap[x] = addmod(v, mulmod(state[2], M[2][x], F), F);
       }
-      state[0] = swap[0];
-      state[1] = swap[1];
-      state[2] = swap[2];
     }
     console.log(g - gasleft());
-    return state[0];
+    return swap[0];
   }
 
   function pow5mod(uint i) public pure returns (uint) {
