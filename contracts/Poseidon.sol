@@ -1,12 +1,6 @@
 /// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "hardhat/console.sol";
-
-interface Poseidon2 {
-  function poseidon(uint[2] memory) external view returns (uint);
-}
-
 contract Poseidon {
   uint constant F = 21888242871839275222246405745257275088548364400416034343698204186575808495617;
   uint constant ROUNDS_F = 8;
@@ -23,23 +17,9 @@ contract Poseidon {
   uint constant M21 = 0x101071f0032379b697315876690f053d148d4e109f5fb065c8aacc55a0f89bfa;
   uint constant M22 = 0x19a3fc0a56702bf417ba7fee3802593fa644470307043f7773279cd71d25d5e0;
 
-  function extBenchmark(address p) public view returns (uint) {
-    uint g = gasleft();
-    uint r = Poseidon2(p).poseidon([uint(2), 1]);
-    console.log("iden3 impl", g - gasleft());
-    return r;
-  }
-
-  function hashBenchmark(uint[2] memory inputs) public view returns (uint) {
-    uint g = gasleft();
-    uint r = hash(inputs);
-    console.log("solidity impl", g - gasleft());
-    return r;
-  }
-
   // See here for a simplified implementation: https://github.com/vimwitch/poseidon-solidity/blob/e57becdabb65d99fdc586fe1e1e09e7108202d53/contracts/Poseidon.sol#L40
   // Based on: https://github.com/iden3/circomlibjs/blob/v0.0.8/src/poseidon_slow.js
-  function hash(uint[2] memory inputs) public pure returns (uint) {
+  function poseidon(uint[2] memory inputs) public pure returns (uint) {
 
     uint state0;
     uint state1 = inputs[0];

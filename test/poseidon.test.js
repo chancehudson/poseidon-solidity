@@ -7,9 +7,12 @@ describe('Poseidon', function () {
 
   it('should hash elements', async () => {
     const [owner] = await ethers.getSigners()
+    const Test = await ethers.getContractFactory('Test')
+    const test = await Test.deploy()
     const Poseidon = await ethers.getContractFactory('Poseidon')
     const _poseidon = await Poseidon.deploy()
-    const h = await _poseidon.hashBenchmark([2,1])
+    console.log('soldity implementation:')
+    const h = await test.benchmark(_poseidon.address)
     assert.equal(h.toString(), poseidon([2, 1]).toString())
     assert.equal(h.toString(), poseidon_slow([2, 1]).toString())
   })
@@ -18,12 +21,13 @@ describe('Poseidon', function () {
     const bytecode = poseidon_gencontract.createCode(2)
     const abi = poseidon_gencontract.generateABI(2)
     const [owner] = await ethers.getSigners()
-    const Poseidon = await ethers.getContractFactory('Poseidon')
-    const _poseidon = await Poseidon.deploy()
+    const Test = await ethers.getContractFactory('Test')
+    const test = await Test.deploy()
     const f = new ethers.ContractFactory(abi, bytecode, owner)
     const c = await f.deploy()
     await c.deployed()
-    await _poseidon.extBenchmark(c.address)
+    console.log('iden3 implementation:')
+    await test.benchmark(c.address)
   })
 
   it('should check many random elements', async () => {
@@ -33,7 +37,7 @@ describe('Poseidon', function () {
     for (let x = 0; x < 10; x++) {
       const i0 = Math.floor(Math.random() * 100000000)
       const i1 = Math.floor(Math.random() * 100000000)
-      const h = await _poseidon.hash([i0,i1])
+      const h = await _poseidon.poseidon([i0,i1])
       assert.equal(h.toString(), poseidon([i0, i1]).toString())
       assert.equal(h.toString(), poseidon_slow([i0, i1]).toString())
     }
