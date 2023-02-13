@@ -1,17 +1,29 @@
 const { ethers } = require('hardhat')
-const { poseidon_slow } = require('circomlibjs')
+const { poseidon_slow, poseidon_gencontract } = require('circomlibjs')
 const poseidon = require('poseidon-lite')
 const assert = require('assert')
 
-
 describe('Poseidon', function () {
+
   it('should hash elements', async () => {
     const [owner] = await ethers.getSigners()
     const Poseidon = await ethers.getContractFactory('Poseidon')
     const _poseidon = await Poseidon.deploy()
-    const h = await _poseidon.hashBenchmark([0,1])
-    assert.equal(h.toString(), poseidon([0, 1]).toString())
-    assert.equal(h.toString(), poseidon_slow([0, 1]).toString())
+    const h = await _poseidon.hashBenchmark([2,1])
+    assert.equal(h.toString(), poseidon([2, 1]).toString())
+    assert.equal(h.toString(), poseidon_slow([2, 1]).toString())
+  })
+
+  it('should check against iden3 impl', async () => {
+    const bytecode = poseidon_gencontract.createCode(2)
+    const abi = poseidon_gencontract.generateABI(2)
+    const [owner] = await ethers.getSigners()
+    const Poseidon = await ethers.getContractFactory('Poseidon')
+    const _poseidon = await Poseidon.deploy()
+    const f = new ethers.ContractFactory(abi, bytecode, owner)
+    const c = await f.deploy()
+    await c.deployed()
+    await _poseidon.extBenchmark(c.address)
   })
 
   it('should check many random elements', async () => {

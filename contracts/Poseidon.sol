@@ -3,6 +3,10 @@ pragma solidity ^0.8.0;
 
 import "hardhat/console.sol";
 
+interface Poseidon2 {
+  function poseidon(uint[2] memory) external view returns (uint);
+}
+
 contract Poseidon {
   uint constant F = 21888242871839275222246405745257275088548364400416034343698204186575808495617;
   uint constant ROUNDS_F = 8;
@@ -19,10 +23,17 @@ contract Poseidon {
   uint constant M21 = 0x101071f0032379b697315876690f053d148d4e109f5fb065c8aacc55a0f89bfa;
   uint constant M22 = 0x19a3fc0a56702bf417ba7fee3802593fa644470307043f7773279cd71d25d5e0;
 
+  function extBenchmark(address p) public view returns (uint) {
+    uint g = gasleft();
+    uint r = Poseidon2(p).poseidon([uint(2), 1]);
+    console.log("iden2 impl", g - gasleft());
+    return r;
+  }
+
   function hashBenchmark(uint[2] memory inputs) public view returns (uint) {
     uint g = gasleft();
     uint r = hash(inputs);
-    console.log(g - gasleft());
+    console.log("solidity impl", g - gasleft());
     return r;
   }
 
