@@ -57,9 +57,9 @@ contract Poseidon {
       state1 = pow5mod(state1);
       state2 = pow5mod(state2);
 
-      swap0 = addmod(addmod(addmod(0, mulmod(state0, M00, F), F), mulmod(state1, M10, F), F), mulmod(state2, M20, F), F);
-      swap1 = addmod(addmod(addmod(0, mulmod(state0, M01, F), F), mulmod(state1, M11, F), F), mulmod(state2, M21, F), F);
-      swap2 = addmod(addmod(addmod(0, mulmod(state0, M02, F), F), mulmod(state1, M12, F), F), mulmod(state2, M22, F), F);
+      swap0 = addmod(addmod(mulmod(state0, M00, F), mulmod(state1, M10, F), F), mulmod(state2, M20, F), F);
+      swap1 = addmod(addmod(mulmod(state0, M01, F), mulmod(state1, M11, F), F), mulmod(state2, M21, F), F);
+      swap2 = addmod(addmod(mulmod(state0, M02, F), mulmod(state1, M12, F), F), mulmod(state2, M22, F), F);
     }
     for (; r < ROUNDS_F / 2 + ROUNDS_P; r++) {
       state0 = addmod(swap0, C[r * T + 0], F);
@@ -68,9 +68,9 @@ contract Poseidon {
 
       state0 = pow5mod(state0);
 
-      swap0 = addmod(addmod(addmod(0, mulmod(state0, M00, F), F), mulmod(state1, M10, F), F), mulmod(state2, M20, F), F);
-      swap1 = addmod(addmod(addmod(0, mulmod(state0, M01, F), F), mulmod(state1, M11, F), F), mulmod(state2, M21, F), F);
-      swap2 = addmod(addmod(addmod(0, mulmod(state0, M02, F), F), mulmod(state1, M12, F), F), mulmod(state2, M22, F), F);
+      swap0 = addmod(addmod(mulmod(state0, M00, F), mulmod(state1, M10, F), F), mulmod(state2, M20, F), F);
+      swap1 = addmod(addmod(mulmod(state0, M01, F), mulmod(state1, M11, F), F), mulmod(state2, M21, F), F);
+      swap2 = addmod(addmod(mulmod(state0, M02, F), mulmod(state1, M12, F), F), mulmod(state2, M22, F), F);
     }
     for (; r < ROUNDS_F + ROUNDS_P; r++) {
       state0 = addmod(swap0, C[r * T + 0], F);
@@ -81,9 +81,9 @@ contract Poseidon {
       state1 = pow5mod(state1);
       state2 = pow5mod(state2);
 
-      swap0 = addmod(addmod(addmod(0, mulmod(state0, M00, F), F), mulmod(state1, M10, F), F), mulmod(state2, M20, F), F);
-      swap1 = addmod(addmod(addmod(0, mulmod(state0, M01, F), F), mulmod(state1, M11, F), F), mulmod(state2, M21, F), F);
-      swap2 = addmod(addmod(addmod(0, mulmod(state0, M02, F), F), mulmod(state1, M12, F), F), mulmod(state2, M22, F), F);
+      swap0 = addmod(addmod(mulmod(state0, M00, F), mulmod(state1, M10, F), F), mulmod(state2, M20, F), F);
+      swap1 = addmod(addmod(mulmod(state0, M01, F), mulmod(state1, M11, F), F), mulmod(state2, M21, F), F);
+      swap2 = addmod(addmod(mulmod(state0, M02, F), mulmod(state1, M12, F), F), mulmod(state2, M22, F), F);
     }
     return swap0;
   }
