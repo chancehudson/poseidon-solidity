@@ -11,11 +11,15 @@ const T = 3
 const F = '21888242871839275222246405745257275088548364400416034343698204186575808495617'
 
 let f = `
-uint p;
+// we're assuming that 0x80 is usable as scratch memory
+// make sure we're not overwriting another functions memory
+if eq(eq(inputs, 0x80), 0) {
+  revert(0, 0)
+}
 
-uint state0;
-uint state1 = inputs[0];
-uint state2 = inputs[1];
+// scratch variable for exponentiation
+let p
+
 `
 
 let r = 0
@@ -30,56 +34,58 @@ const SM1 = state0 * M01 % BigInt(F)
 const SM2 = state0 * M02 % BigInt(F)
 
 f += `
-state1 = addmod(state1, ${C[r*T+1]}, F);
-state2 = addmod(state2, ${C[r*T+2]}, F);
+{
+  let state0
 
-// this is pre-calculated
-// p = mulmod(state0, state0, F);
-// state0 = mulmod(mulmod(p, p, F), state0, F);
-p = mulmod(state1, state1, F);
-state1 = mulmod(mulmod(p, p, F), state1, F);
-p = mulmod(state2, state2, F);
-state2 = mulmod(mulmod(p, p, F), state2, F);
+  // load the inputs from memory
+  let state1 := addmod(mload(0x80), ${C[r*T+1]}, F)
+  let state2 := addmod(mload(0xa0), ${C[r*T+2]}, F)
+
+
+  p := mulmod(state1, state1, F)
+  state1 := mulmod(mulmod(p, p, F), state1, F)
+  p := mulmod(state2, state2, F)
+  state2 := mulmod(mulmod(p, p, F), state2, F)
+
+  // state0 pow5mod and M[] multiplications are pre-calculated
+
+  mstore(0, addmod(addmod(${'0x'+SM0.toString(16)}, mulmod(state1, M10, F), F), mulmod(state2, M20, F), F))
+  mstore(0x20, addmod(addmod(${'0x'+SM1.toString(16)}, mulmod(state1, M11, F), F), mulmod(state2, M21, F), F))
+  mstore(0x80, addmod(addmod(${'0x'+SM2.toString(16)}, mulmod(state1, M12, F), F), mulmod(state2, M22, F), F))
+}
 `
 r++
-
-f += `
-(state0, state1, state2) = hashFRound(
-  addmod(addmod(${'0x'+SM0.toString(16)}, mulmod(state1, M10, F), F), mulmod(state2, M20, F), F),
-  addmod(addmod(${'0x'+SM1.toString(16)}, mulmod(state1, M11, F), F), mulmod(state2, M21, F), F),
-  addmod(addmod(${'0x'+SM2.toString(16)}, mulmod(state1, M12, F), F), mulmod(state2, M22, F), F),
-  0x2f27be690fdaee46c3ce28f7532b13c856c35342c84bda6e20966310fadc01d0,
-  0x2b2ae1acf68b7b8d2416bebf3d4f6234b763fe04b8043ee48b8327bebca16cf2,
-  0x0319d062072bef7ecca5eac06f97d4d55952c175ab6b03eae64b44c7dbf11cfa
-);
-`
-r++
-
 
 for (; r < ROUNDS_F + ROUNDS_P - 1; r++) {
-  const func = r < ROUNDS_F / 2 || r >= ROUNDS_F / 2 + ROUNDS_P ? 'hashFRound' : 'hashPRound'
+  const func = r < ROUNDS_F / 2 || r >= ROUNDS_F / 2 + ROUNDS_P ? 'fRound' : 'pRound'
   f += `
-(state0, state1, state2) = ${func}(state0, state1, state2,
+${func}(
   ${C[r*T]},
   ${C[r*T + 1]},
   ${C[r*T + 2]}
-);
+)
 `
 }
 
 f += `
-state0 = addmod(state0, ${C[r*T]}, F);
-state1 = addmod(state1, ${C[r*T+1]}, F);
-state2 = addmod(state2, ${C[r*T+2]}, F);
+{
+  let state0 := addmod(mload(0), ${C[r*T]}, F)
+  let state1 := addmod(mload(0x20), ${C[r*T+1]}, F)
+  let state2 := addmod(mload(0x80), ${C[r*T+2]}, F)
 
-p = mulmod(state0, state0, F);
-state0 = mulmod(mulmod(p, p, F), state0, F);
-p = mulmod(state1, state1, F);
-state1 = mulmod(mulmod(p, p, F), state1, F);
-p = mulmod(state2, state2, F);
-state2 = mulmod(mulmod(p, p, F), state2, F);
+  p := mulmod(state0, state0, F)
+  state0 := mulmod(mulmod(p, p, F), state0, F)
+  p := mulmod(state1, state1, F)
+  state1 := mulmod(mulmod(p, p, F), state1, F)
+  p := mulmod(state2, state2, F)
+  state2 := mulmod(mulmod(p, p, F), state2, F)
 
-return addmod(addmod(mulmod(state0, M00, F), mulmod(state1, M10, F), F), mulmod(state2, M20, F), F);
+  mstore(
+    0,
+    addmod(addmod(mulmod(state0, M00, F), mulmod(state1, M10, F), F), mulmod(state2, M20, F), F)
+  )
+  return(0, 0x20)
+}
 `
 
 console.log(f)

@@ -71,6 +71,7 @@ contract Poseidon {
       {
         let state0
 
+        // load the inputs from memory
         let state1 := addmod(mload(0x80), 0x00f1445235f2148c5986587169fc1bcd887b08d4d00868df5696fff40956e864, F)
         let state2 := addmod(mload(0xa0), 0x08dff3487e8ac99e1f29a058d0fa80b930c728730b7ab36ce879f3890ecf73f5, F)
 

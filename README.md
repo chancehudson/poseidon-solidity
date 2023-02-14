@@ -14,13 +14,13 @@ npm test
 Deploy cost
 
 ```
-solidity - 2,492,296 gas
+solidity - 2,333,415 gas
 raw opcodes - 2,156,516 gas
 ```
 
 Hash cost
 
 ```
-solidity - 33,353 gas
-raw opcodes - 32,176 gas
+solidity - 29,893 gas
+raw opcodes - 32,173 gas
 ```
