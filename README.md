@@ -1,6 +1,6 @@
 # poseidon solidity
 
-Poseidon implementation in solidity.
+PoseidonT3 implementation in solidity.
 
 ## Testing
 
@@ -11,7 +11,16 @@ npm test
 
 ## Benchmark
 
-```js
-solidity - 34387 gas
-iden3 opcodes - 32226 gas
+Deploy cost
+
+```
+solidity - 2,492,296 gas
+raw opcodes - 2,156,516 gas
+```
+
+Hash cost
+
+```
+solidity - 33,561 gas
+raw opcodes - 32,176 gas
 ```

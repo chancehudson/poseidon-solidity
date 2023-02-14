@@ -20,18 +20,27 @@ contract Poseidon {
   // See here for a simplified implementation: https://github.com/vimwitch/poseidon-solidity/blob/e57becdabb65d99fdc586fe1e1e09e7108202d53/contracts/Poseidon.sol#L40
   // Based on: https://github.com/iden3/circomlibjs/blob/v0.0.8/src/poseidon_slow.js
   function poseidon(uint[2] memory inputs) public pure returns (uint) {
+    uint p;
 
     uint state0;
     uint state1 = inputs[0];
     uint state2 = inputs[1];
 
-    (state0, state1, state2) = hashFRound(state0, state1, state2,
-      0x0ee9a592ba9a9518d05986d656f40c2114c4993c11bb29938d21d47304cd8e6e,
-      0x00f1445235f2148c5986587169fc1bcd887b08d4d00868df5696fff40956e864,
-      0x08dff3487e8ac99e1f29a058d0fa80b930c728730b7ab36ce879f3890ecf73f5
-    );
+    state1 = addmod(state1, 0x00f1445235f2148c5986587169fc1bcd887b08d4d00868df5696fff40956e864, F);
+    state2 = addmod(state2, 0x08dff3487e8ac99e1f29a058d0fa80b930c728730b7ab36ce879f3890ecf73f5, F);
 
-    (state0, state1, state2) = hashFRound(state0, state1, state2,
+    // this is pre-calculated
+    // p = mulmod(state0, state0, F);
+    // state0 = mulmod(mulmod(p, p, F), state0, F);
+    p = mulmod(state1, state1, F);
+    state1 = mulmod(mulmod(p, p, F), state1, F);
+    p = mulmod(state2, state2, F);
+    state2 = mulmod(mulmod(p, p, F), state2, F);
+
+    (state0, state1, state2) = hashFRound(
+      addmod(addmod(0x2229fe5e63f56eef4bfba02c26292de10ac2b2b045e6184acff16e4660c05f6b, mulmod(state1, M10, F), F), mulmod(state2, M20, F), F),
+      addmod(addmod(0x2949435275a29cdbffe3e4101a45669873f9408a5d11e21b4ec6edf8501eee4d, mulmod(state1, M11, F), F), mulmod(state2, M21, F), F),
+      addmod(addmod(0x20c290a7269657965092ef5700a447f5bc2c41dfca932f527cb2600ac9bcfefb, mulmod(state1, M12, F), F), mulmod(state2, M22, F), F),
       0x2f27be690fdaee46c3ce28f7532b13c856c35342c84bda6e20966310fadc01d0,
       0x2b2ae1acf68b7b8d2416bebf3d4f6234b763fe04b8043ee48b8327bebca16cf2,
       0x0319d062072bef7ecca5eac06f97d4d55952c175ab6b03eae64b44c7dbf11cfa
@@ -409,15 +418,16 @@ contract Poseidon {
       0x102adf8ef74735a27e9128306dcbc3c99f6f7291cd406578ce14ea2adaba68f8
     );
 
-    // final round can be short circuited
-
     state0 = addmod(state0, 0x0fe0af7858e49859e2a54d6f1ad945b1316aa24bfbdd23ae40a6d0cb70c3eab1, F);
     state1 = addmod(state1, 0x216f6717bbc7dedb08536a2220843f4e2da5f1daa9ebdefde8a5ea7344798d22, F);
     state2 = addmod(state2, 0x1da55cc900f0d21f4a3e694391918a1b3c23b2ac773c6b3ef88e2e4228325161, F);
 
-    state0 = mulmod(mulmod(mulmod(state0, state0, F), mulmod(state0, state0, F), F), state0, F);
-    state1 = mulmod(mulmod(mulmod(state1, state1, F), mulmod(state1, state1, F), F), state1, F);
-    state2 = mulmod(mulmod(mulmod(state2, state2, F), mulmod(state2, state2, F), F), state2, F);
+    p = mulmod(state0, state0, F);
+    state0 = mulmod(mulmod(p, p, F), state0, F);
+    p = mulmod(state1, state1, F);
+    state1 = mulmod(mulmod(p, p, F), state1, F);
+    p = mulmod(state2, state2, F);
+    state2 = mulmod(mulmod(p, p, F), state2, F);
 
     return addmod(addmod(mulmod(state0, M00, F), mulmod(state1, M10, F), F), mulmod(state2, M20, F), F);
   }
@@ -429,15 +439,19 @@ contract Poseidon {
     uint c0,
     uint c1,
     uint c2
-  ) public pure returns (uint swap0, uint swap1, uint swap2) {
+  ) private pure returns (uint swap0, uint swap1, uint swap2) {
 
     state0 = addmod(state0, c0, F);
     state1 = addmod(state1, c1, F);
     state2 = addmod(state2, c2, F);
 
-    state0 = mulmod(mulmod(mulmod(state0, state0, F), mulmod(state0, state0, F), F), state0, F);
-    state1 = mulmod(mulmod(mulmod(state1, state1, F), mulmod(state1, state1, F), F), state1, F);
-    state2 = mulmod(mulmod(mulmod(state2, state2, F), mulmod(state2, state2, F), F), state2, F);
+    uint p; // using an intermediate variable is cheaper here than using swap0
+    p = mulmod(state0, state0, F);
+    state0 = mulmod(mulmod(p, p, F), state0, F);
+    p = mulmod(state1, state1, F);
+    state1 = mulmod(mulmod(p, p, F), state1, F);
+    p = mulmod(state2, state2, F);
+    state2 = mulmod(mulmod(p, p, F), state2, F);
 
     swap0 = addmod(addmod(mulmod(state0, M00, F), mulmod(state1, M10, F), F), mulmod(state2, M20, F), F);
     swap1 = addmod(addmod(mulmod(state0, M01, F), mulmod(state1, M11, F), F), mulmod(state2, M21, F), F);
@@ -452,13 +466,15 @@ contract Poseidon {
     uint c0,
     uint c1,
     uint c2
-  ) public pure returns (uint swap0, uint swap1, uint swap2) {
+  ) private pure returns (uint swap0, uint swap1, uint swap2) {
 
     state0 = addmod(state0, c0, F);
     state1 = addmod(state1, c1, F);
     state2 = addmod(state2, c2, F);
 
-    state0 = mulmod(mulmod(mulmod(state0, state0, F), mulmod(state0, state0, F), F), state0, F);
+    // here it's cheaper to use the swap0 variable already in the scope
+    swap0 = mulmod(state0, state0, F);
+    state0 = mulmod(mulmod(swap0, swap0, F), state0, F);
 
     swap0 = addmod(addmod(mulmod(state0, M00, F), mulmod(state1, M10, F), F), mulmod(state2, M20, F), F);
     swap1 = addmod(addmod(mulmod(state0, M01, F), mulmod(state1, M11, F), F), mulmod(state2, M21, F), F);
