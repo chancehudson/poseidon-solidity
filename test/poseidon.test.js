@@ -3,13 +3,13 @@ const { poseidon_slow, poseidon_gencontract } = require('circomlibjs')
 const poseidon = require('poseidon-lite')
 const assert = require('assert')
 
-describe('Poseidon', function () {
+describe('PoseidonT3', function () {
 
   it('should hash elements', async () => {
     const [owner] = await ethers.getSigners()
     const Test = await ethers.getContractFactory('Test')
     const test = await Test.deploy()
-    const Poseidon = await ethers.getContractFactory('Poseidon')
+    const Poseidon = await ethers.getContractFactory('PoseidonT3')
     const _poseidon = await Poseidon.deploy()
     console.log('soldity implementation:')
     const h = await test.benchmark(_poseidon.address)
@@ -32,7 +32,7 @@ describe('Poseidon', function () {
 
   it('should check many random elements', async () => {
     const [owner] = await ethers.getSigners()
-    const Poseidon = await ethers.getContractFactory('Poseidon')
+    const Poseidon = await ethers.getContractFactory('PoseidonT3')
     const _poseidon = await Poseidon.deploy()
     for (let x = 0; x < 10; x++) {
       const i0 = Math.floor(Math.random() * 100000000)
