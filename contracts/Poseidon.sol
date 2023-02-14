@@ -1,11 +1,8 @@
 /// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity >=0.7.0;
 
 contract Poseidon {
   uint constant F = 21888242871839275222246405745257275088548364400416034343698204186575808495617;
-  uint constant ROUNDS_F = 8;
-  uint constant ROUNDS_P = 57;
-  uint constant T = 3;
 
   uint constant M00 = 0x109b7f411ba0e4c9b2b70caf5c36a7b194be7c11ad24378bfedb68592ba8118b;
   uint constant M01 = 0x2969f27eed31a480b9c36c764379dbca2cc8fdd1415c3dded62940bcde0bd771;

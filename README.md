@@ -21,6 +21,6 @@ raw opcodes - 2,156,516 gas
 Hash cost
 
 ```
-solidity - 33,561 gas
+solidity - 33,353 gas
 raw opcodes - 32,176 gas
 ```

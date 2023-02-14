@@ -1,10 +1,10 @@
 /// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity >=0.7.0;
 
 import "hardhat/console.sol";
 
 interface PoseidonT3 {
-  function poseidon(uint[2] memory) external pure returns (uint);
+  function poseidon(uint[2] calldata) external pure returns (uint);
 }
 
 contract Test {
