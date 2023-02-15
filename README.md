@@ -18,6 +18,10 @@ Hash cost
 
 ## Use
 
+```sh
+npm i poseidon-solidity
+```
+
 ```solidity
 import "poseidon-solidity/PoseidonT3.sol";
 
