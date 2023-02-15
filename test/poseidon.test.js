@@ -3,6 +3,8 @@ const { poseidon_slow, poseidon_gencontract } = require('circomlibjs')
 const poseidon = require('poseidon-lite')
 const assert = require('assert')
 
+const F_MAX = BigInt('21888242871839275222246405745257275088548364400416034343698204186575808495617') - BigInt(1)
+
 describe('PoseidonT3', function () {
 
   it('should hash elements', async () => {
@@ -35,11 +37,37 @@ describe('PoseidonT3', function () {
     const Poseidon = await ethers.getContractFactory('PoseidonT3')
     const _poseidon = await Poseidon.deploy()
     for (let x = 0; x < 10; x++) {
-      const i0 = Math.floor(Math.random() * 100000000)
-      const i1 = Math.floor(Math.random() * 100000000)
+      const i0 = poseidon([Math.floor(Math.random() * 100000000)])
+      const i1 = poseidon([Math.floor(Math.random() * 100000000)])
       const h = await _poseidon.hash([i0,i1])
       assert.equal(h.toString(), poseidon([i0, i1]).toString())
       assert.equal(h.toString(), poseidon_slow([i0, i1]).toString())
+    }
+  })
+
+  it('should correctly hash edge inputs', async () => {
+    const [owner] = await ethers.getSigners()
+    const Poseidon = await ethers.getContractFactory('PoseidonT3')
+    const _poseidon = await Poseidon.deploy()
+    {
+      const h = await _poseidon.hash([0,0])
+      assert.equal(h.toString(), poseidon([0, 0]).toString())
+      assert.equal(h.toString(), poseidon_slow([0, 0]).toString())
+    }
+    {
+      const h = await _poseidon.hash([F_MAX,F_MAX])
+      assert.equal(h.toString(), poseidon([F_MAX, F_MAX]).toString())
+      assert.equal(h.toString(), poseidon_slow([F_MAX, F_MAX]).toString())
+    }
+    {
+      const h = await _poseidon.hash([0,F_MAX])
+      assert.equal(h.toString(), poseidon([0, F_MAX]).toString())
+      assert.equal(h.toString(), poseidon_slow([0, F_MAX]).toString())
+    }
+    {
+      const h = await _poseidon.hash([F_MAX,0])
+      assert.equal(h.toString(), poseidon([F_MAX, 0]).toString())
+      assert.equal(h.toString(), poseidon_slow([F_MAX, 0]).toString())
     }
   })
 })
