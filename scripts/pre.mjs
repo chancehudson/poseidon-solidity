@@ -12,6 +12,7 @@ const finalPackage = Object.assign(_package, {
   dependencies: {},
   scripts: {},
 })
+delete finalPackage.prettier
 
 const buildDir = path.join(__dirname, '../build')
 

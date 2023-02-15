@@ -6,10 +6,18 @@
     "type": "git",
     "url": "https://github.com/vimwitch/poseidon-solidity.git"
   },
-  "keywords": ["poseidon", "solidity", "zk", "ethereum"],
+  "keywords": [
+    "poseidon",
+    "solidity",
+    "zk",
+    "ethereum",
+    "hash"
+  ],
   "scripts": {
+    "lint": "prettier {test/*,src/*.mjs}",
     "pre": "node scripts/pre.mjs",
-    "build": "hardhat compile",
+    "build": "node src/build.mjs && hardhat compile",
+    "compile": "hardhat compile",
     "test": "hardhat test"
   },
   "author": "Chance Hudson",
@@ -19,6 +27,13 @@
     "big-integer": "^1.6.51",
     "circomlibjs": "^0.0.8",
     "hardhat": "^2.12.7",
-    "poseidon-lite": "^0.0.2"
+    "poseidon-lite": "^0.0.2",
+    "prettier": "^2.8.4",
+    "prettier-plugin-solidity": "^1.1.2"
+  },
+  "prettier": {
+    "tabWidth": 2,
+    "semi": false,
+    "singleQuote": true
   }
 }
