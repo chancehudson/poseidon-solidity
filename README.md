@@ -35,8 +35,10 @@ npm install
 npm test
 ```
 
+<br />
+
 <div align="center">
 <a href="https://appliedzkp.org">
-<img src="https://raw.githubusercontent.com/vimwitch/poseidon-solidity/main/pse_logo.svg" />
+<img width="50px" height="auto" src="https://raw.githubusercontent.com/vimwitch/poseidon-solidity/main/pse_logo.svg" />
 </a>
 </div>
