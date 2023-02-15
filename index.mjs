@@ -56,6 +56,67 @@ f += `
 `
 r++
 
+const unrolledCount = 15
+
+for (; r < ROUNDS_F/2; r++) {
+  const func = r < ROUNDS_F / 2 || r >= ROUNDS_F / 2 + ROUNDS_P ? 'fRound' : 'pRound'
+  f += `
+${func}(
+  ${C[r*T]},
+  ${C[r*T + 1]},
+  ${C[r*T + 2]}
+)
+`
+}
+
+f += `
+{
+  let swap0, swap1, swap2
+  let state0 := addmod(mload(0), ${C[r*T]}, F)
+  let state1 := addmod(mload(0x20), ${C[r*T+1]}, F)
+  let state2 := addmod(mload(0x80), ${C[r*T+2]}, F)
+
+  p := mulmod(state0, state0, F)
+  state0 := mulmod(mulmod(p, p, F), state0, F)
+
+  swap0 := addmod(addmod(mulmod(state0, M00, F), mulmod(state1, M10, F), F), mulmod(state2, M20, F), F)
+  swap1 := addmod(addmod(mulmod(state0, M01, F), mulmod(state1, M11, F), F), mulmod(state2, M21, F), F)
+  swap2 := addmod(addmod(mulmod(state0, M02, F), mulmod(state1, M12, F), F), mulmod(state2, M22, F), F)
+`
+r++
+for (let x = 1; x < unrolledCount - 1; x++) {
+  f += `
+  state0 := addmod(swap0, ${C[r*T]}, F)
+  state1 := addmod(swap1, ${C[r*T+1]}, F)
+  state2 := addmod(swap2, ${C[r*T+2]}, F)
+
+  p := mulmod(state0, state0, F)
+  state0 := mulmod(mulmod(p, p, F), state0, F)
+
+  swap0 := addmod(addmod(mulmod(state0, M00, F), mulmod(state1, M10, F), F), mulmod(state2, M20, F), F)
+  swap1 := addmod(addmod(mulmod(state0, M01, F), mulmod(state1, M11, F), F), mulmod(state2, M21, F), F)
+  swap2 := addmod(addmod(mulmod(state0, M02, F), mulmod(state1, M12, F), F), mulmod(state2, M22, F), F)
+`
+
+  r++
+}
+
+f += `
+  state0 := addmod(swap0, ${C[r*T]}, F)
+  state1 := addmod(swap1, ${C[r*T+1]}, F)
+  state2 := addmod(swap2, ${C[r*T+2]}, F)
+
+  p := mulmod(state0, state0, F)
+  state0 := mulmod(mulmod(p, p, F), state0, F)
+
+  mstore(0, addmod(addmod(mulmod(state0, M00, F), mulmod(state1, M10, F), F), mulmod(state2, M20, F), F))
+  mstore(0x20, addmod(addmod(mulmod(state0, M01, F), mulmod(state1, M11, F), F), mulmod(state2, M21, F), F))
+  mstore(0x80, addmod(addmod(mulmod(state0, M02, F), mulmod(state1, M12, F), F), mulmod(state2, M22, F), F))
+`
+r++
+
+f += `}`
+
 for (; r < ROUNDS_F + ROUNDS_P - 1; r++) {
   const func = r < ROUNDS_F / 2 || r >= ROUNDS_F / 2 + ROUNDS_P ? 'fRound' : 'pRound'
   f += `

@@ -105,95 +105,173 @@ library PoseidonT3 {
         0x1bcd95ffc211fbca600f705fad3fb567ea4eb378f62e1fec97805518a47e4d9c
       )
 
-      pRound(
-        0x10520b0ab721cadfe9eff81b016fc34dc76da36c2578937817cb978d069de559,
-        0x1f6d48149b8e7f7d9b257d8ed5fbbaf42932498075fed0ace88a9eb81f5627f6,
-        0x1d9655f652309014d29e00ef35a2089bfff8dc1c816f0dc9ca34bdb5460c8705
-      )
+      {
+        let swap0, swap1, swap2
+        let state0 := addmod(mload(0), 0x10520b0ab721cadfe9eff81b016fc34dc76da36c2578937817cb978d069de559, F)
+        let state1 := addmod(mload(0x20), 0x1f6d48149b8e7f7d9b257d8ed5fbbaf42932498075fed0ace88a9eb81f5627f6, F)
+        let state2 := addmod(mload(0x80), 0x1d9655f652309014d29e00ef35a2089bfff8dc1c816f0dc9ca34bdb5460c8705, F)
 
-      pRound(
-        0x04df5a56ff95bcafb051f7b1cd43a99ba731ff67e47032058fe3d4185697cc7d,
-        0x0672d995f8fff640151b3d290cedaf148690a10a8c8424a7f6ec282b6e4be828,
-        0x099952b414884454b21200d7ffafdd5f0c9a9dcc06f2708e9fc1d8209b5c75b9
-      )
+        p := mulmod(state0, state0, F)
+        state0 := mulmod(mulmod(p, p, F), state0, F)
 
-      pRound(
-        0x052cba2255dfd00c7c483143ba8d469448e43586a9b4cd9183fd0e843a6b9fa6,
-        0x0b8badee690adb8eb0bd74712b7999af82de55707251ad7716077cb93c464ddc,
-        0x119b1590f13307af5a1ee651020c07c749c15d60683a8050b963d0a8e4b2bdd1
-      )
+        swap0 := addmod(addmod(mulmod(state0, M00, F), mulmod(state1, M10, F), F), mulmod(state2, M20, F), F)
+        swap1 := addmod(addmod(mulmod(state0, M01, F), mulmod(state1, M11, F), F), mulmod(state2, M21, F), F)
+        swap2 := addmod(addmod(mulmod(state0, M02, F), mulmod(state1, M12, F), F), mulmod(state2, M22, F), F)
 
-      pRound(
-        0x03150b7cd6d5d17b2529d36be0f67b832c4acfc884ef4ee5ce15be0bfb4a8d09,
-        0x2cc6182c5e14546e3cf1951f173912355374efb83d80898abe69cb317c9ea565,
-        0x005032551e6378c450cfe129a404b3764218cadedac14e2b92d2cd73111bf0f9
-      )
+        state0 := addmod(swap0, 0x04df5a56ff95bcafb051f7b1cd43a99ba731ff67e47032058fe3d4185697cc7d, F)
+        state1 := addmod(swap1, 0x0672d995f8fff640151b3d290cedaf148690a10a8c8424a7f6ec282b6e4be828, F)
+        state2 := addmod(swap2, 0x099952b414884454b21200d7ffafdd5f0c9a9dcc06f2708e9fc1d8209b5c75b9, F)
 
-      pRound(
-        0x233237e3289baa34bb147e972ebcb9516469c399fcc069fb88f9da2cc28276b5,
-        0x05c8f4f4ebd4a6e3c980d31674bfbe6323037f21b34ae5a4e80c2d4c24d60280,
-        0x0a7b1db13042d396ba05d818a319f25252bcf35ef3aeed91ee1f09b2590fc65b
-      )
+        p := mulmod(state0, state0, F)
+        state0 := mulmod(mulmod(p, p, F), state0, F)
 
-      pRound(
-        0x2a73b71f9b210cf5b14296572c9d32dbf156e2b086ff47dc5df542365a404ec0,
-        0x1ac9b0417abcc9a1935107e9ffc91dc3ec18f2c4dbe7f22976a760bb5c50c460,
-        0x12c0339ae08374823fabb076707ef479269f3e4d6cb104349015ee046dc93fc0
-      )
+        swap0 := addmod(addmod(mulmod(state0, M00, F), mulmod(state1, M10, F), F), mulmod(state2, M20, F), F)
+        swap1 := addmod(addmod(mulmod(state0, M01, F), mulmod(state1, M11, F), F), mulmod(state2, M21, F), F)
+        swap2 := addmod(addmod(mulmod(state0, M02, F), mulmod(state1, M12, F), F), mulmod(state2, M22, F), F)
 
-      pRound(
-        0x0b7475b102a165ad7f5b18db4e1e704f52900aa3253baac68246682e56e9a28e,
-        0x037c2849e191ca3edb1c5e49f6e8b8917c843e379366f2ea32ab3aa88d7f8448,
-        0x05a6811f8556f014e92674661e217e9bd5206c5c93a07dc145fdb176a716346f
-      )
+        state0 := addmod(swap0, 0x052cba2255dfd00c7c483143ba8d469448e43586a9b4cd9183fd0e843a6b9fa6, F)
+        state1 := addmod(swap1, 0x0b8badee690adb8eb0bd74712b7999af82de55707251ad7716077cb93c464ddc, F)
+        state2 := addmod(swap2, 0x119b1590f13307af5a1ee651020c07c749c15d60683a8050b963d0a8e4b2bdd1, F)
 
-      pRound(
-        0x29a795e7d98028946e947b75d54e9f044076e87a7b2883b47b675ef5f38bd66e,
-        0x20439a0c84b322eb45a3857afc18f5826e8c7382c8a1585c507be199981fd22f,
-        0x2e0ba8d94d9ecf4a94ec2050c7371ff1bb50f27799a84b6d4a2a6f2a0982c887
-      )
+        p := mulmod(state0, state0, F)
+        state0 := mulmod(mulmod(p, p, F), state0, F)
 
-      pRound(
-        0x143fd115ce08fb27ca38eb7cce822b4517822cd2109048d2e6d0ddcca17d71c8,
-        0x0c64cbecb1c734b857968dbbdcf813cdf8611659323dbcbfc84323623be9caf1,
-        0x028a305847c683f646fca925c163ff5ae74f348d62c2b670f1426cef9403da53
-      )
+        swap0 := addmod(addmod(mulmod(state0, M00, F), mulmod(state1, M10, F), F), mulmod(state2, M20, F), F)
+        swap1 := addmod(addmod(mulmod(state0, M01, F), mulmod(state1, M11, F), F), mulmod(state2, M21, F), F)
+        swap2 := addmod(addmod(mulmod(state0, M02, F), mulmod(state1, M12, F), F), mulmod(state2, M22, F), F)
 
-      pRound(
-        0x2e4ef510ff0b6fda5fa940ab4c4380f26a6bcb64d89427b824d6755b5db9e30c,
-        0x0081c95bc43384e663d79270c956ce3b8925b4f6d033b078b96384f50579400e,
-        0x2ed5f0c91cbd9749187e2fade687e05ee2491b349c039a0bba8a9f4023a0bb38
-      )
+        state0 := addmod(swap0, 0x03150b7cd6d5d17b2529d36be0f67b832c4acfc884ef4ee5ce15be0bfb4a8d09, F)
+        state1 := addmod(swap1, 0x2cc6182c5e14546e3cf1951f173912355374efb83d80898abe69cb317c9ea565, F)
+        state2 := addmod(swap2, 0x005032551e6378c450cfe129a404b3764218cadedac14e2b92d2cd73111bf0f9, F)
 
-      pRound(
-        0x30509991f88da3504bbf374ed5aae2f03448a22c76234c8c990f01f33a735206,
-        0x1c3f20fd55409a53221b7c4d49a356b9f0a1119fb2067b41a7529094424ec6ad,
-        0x10b4e7f3ab5df003049514459b6e18eec46bb2213e8e131e170887b47ddcb96c
-      )
+        p := mulmod(state0, state0, F)
+        state0 := mulmod(mulmod(p, p, F), state0, F)
 
-      pRound(
-        0x2a1982979c3ff7f43ddd543d891c2abddd80f804c077d775039aa3502e43adef,
-        0x1c74ee64f15e1db6feddbead56d6d55dba431ebc396c9af95cad0f1315bd5c91,
-        0x07533ec850ba7f98eab9303cace01b4b9e4f2e8b82708cfa9c2fe45a0ae146a0
-      )
+        swap0 := addmod(addmod(mulmod(state0, M00, F), mulmod(state1, M10, F), F), mulmod(state2, M20, F), F)
+        swap1 := addmod(addmod(mulmod(state0, M01, F), mulmod(state1, M11, F), F), mulmod(state2, M21, F), F)
+        swap2 := addmod(addmod(mulmod(state0, M02, F), mulmod(state1, M12, F), F), mulmod(state2, M22, F), F)
 
-      pRound(
-        0x21576b438e500449a151e4eeaf17b154285c68f42d42c1808a11abf3764c0750,
-        0x2f17c0559b8fe79608ad5ca193d62f10bce8384c815f0906743d6930836d4a9e,
-        0x2d477e3862d07708a79e8aae946170bc9775a4201318474ae665b0b1b7e2730e
-      )
+        state0 := addmod(swap0, 0x233237e3289baa34bb147e972ebcb9516469c399fcc069fb88f9da2cc28276b5, F)
+        state1 := addmod(swap1, 0x05c8f4f4ebd4a6e3c980d31674bfbe6323037f21b34ae5a4e80c2d4c24d60280, F)
+        state2 := addmod(swap2, 0x0a7b1db13042d396ba05d818a319f25252bcf35ef3aeed91ee1f09b2590fc65b, F)
 
-      pRound(
-        0x162f5243967064c390e095577984f291afba2266c38f5abcd89be0f5b2747eab,
-        0x2b4cb233ede9ba48264ecd2c8ae50d1ad7a8596a87f29f8a7777a70092393311,
-        0x2c8fbcb2dd8573dc1dbaf8f4622854776db2eece6d85c4cf4254e7c35e03b07a
-      )
+        p := mulmod(state0, state0, F)
+        state0 := mulmod(mulmod(p, p, F), state0, F)
 
-      pRound(
-        0x1d6f347725e4816af2ff453f0cd56b199e1b61e9f601e9ade5e88db870949da9,
-        0x204b0c397f4ebe71ebc2d8b3df5b913df9e6ac02b68d31324cd49af5c4565529,
-        0x0c4cb9dc3c4fd8174f1149b3c63c3c2f9ecb827cd7dc25534ff8fb75bc79c502
-      )
+        swap0 := addmod(addmod(mulmod(state0, M00, F), mulmod(state1, M10, F), F), mulmod(state2, M20, F), F)
+        swap1 := addmod(addmod(mulmod(state0, M01, F), mulmod(state1, M11, F), F), mulmod(state2, M21, F), F)
+        swap2 := addmod(addmod(mulmod(state0, M02, F), mulmod(state1, M12, F), F), mulmod(state2, M22, F), F)
+
+        state0 := addmod(swap0, 0x2a73b71f9b210cf5b14296572c9d32dbf156e2b086ff47dc5df542365a404ec0, F)
+        state1 := addmod(swap1, 0x1ac9b0417abcc9a1935107e9ffc91dc3ec18f2c4dbe7f22976a760bb5c50c460, F)
+        state2 := addmod(swap2, 0x12c0339ae08374823fabb076707ef479269f3e4d6cb104349015ee046dc93fc0, F)
+
+        p := mulmod(state0, state0, F)
+        state0 := mulmod(mulmod(p, p, F), state0, F)
+
+        swap0 := addmod(addmod(mulmod(state0, M00, F), mulmod(state1, M10, F), F), mulmod(state2, M20, F), F)
+        swap1 := addmod(addmod(mulmod(state0, M01, F), mulmod(state1, M11, F), F), mulmod(state2, M21, F), F)
+        swap2 := addmod(addmod(mulmod(state0, M02, F), mulmod(state1, M12, F), F), mulmod(state2, M22, F), F)
+
+        state0 := addmod(swap0, 0x0b7475b102a165ad7f5b18db4e1e704f52900aa3253baac68246682e56e9a28e, F)
+        state1 := addmod(swap1, 0x037c2849e191ca3edb1c5e49f6e8b8917c843e379366f2ea32ab3aa88d7f8448, F)
+        state2 := addmod(swap2, 0x05a6811f8556f014e92674661e217e9bd5206c5c93a07dc145fdb176a716346f, F)
+
+        p := mulmod(state0, state0, F)
+        state0 := mulmod(mulmod(p, p, F), state0, F)
+
+        swap0 := addmod(addmod(mulmod(state0, M00, F), mulmod(state1, M10, F), F), mulmod(state2, M20, F), F)
+        swap1 := addmod(addmod(mulmod(state0, M01, F), mulmod(state1, M11, F), F), mulmod(state2, M21, F), F)
+        swap2 := addmod(addmod(mulmod(state0, M02, F), mulmod(state1, M12, F), F), mulmod(state2, M22, F), F)
+
+        state0 := addmod(swap0, 0x29a795e7d98028946e947b75d54e9f044076e87a7b2883b47b675ef5f38bd66e, F)
+        state1 := addmod(swap1, 0x20439a0c84b322eb45a3857afc18f5826e8c7382c8a1585c507be199981fd22f, F)
+        state2 := addmod(swap2, 0x2e0ba8d94d9ecf4a94ec2050c7371ff1bb50f27799a84b6d4a2a6f2a0982c887, F)
+
+        p := mulmod(state0, state0, F)
+        state0 := mulmod(mulmod(p, p, F), state0, F)
+
+        swap0 := addmod(addmod(mulmod(state0, M00, F), mulmod(state1, M10, F), F), mulmod(state2, M20, F), F)
+        swap1 := addmod(addmod(mulmod(state0, M01, F), mulmod(state1, M11, F), F), mulmod(state2, M21, F), F)
+        swap2 := addmod(addmod(mulmod(state0, M02, F), mulmod(state1, M12, F), F), mulmod(state2, M22, F), F)
+
+        state0 := addmod(swap0, 0x143fd115ce08fb27ca38eb7cce822b4517822cd2109048d2e6d0ddcca17d71c8, F)
+        state1 := addmod(swap1, 0x0c64cbecb1c734b857968dbbdcf813cdf8611659323dbcbfc84323623be9caf1, F)
+        state2 := addmod(swap2, 0x028a305847c683f646fca925c163ff5ae74f348d62c2b670f1426cef9403da53, F)
+
+        p := mulmod(state0, state0, F)
+        state0 := mulmod(mulmod(p, p, F), state0, F)
+
+        swap0 := addmod(addmod(mulmod(state0, M00, F), mulmod(state1, M10, F), F), mulmod(state2, M20, F), F)
+        swap1 := addmod(addmod(mulmod(state0, M01, F), mulmod(state1, M11, F), F), mulmod(state2, M21, F), F)
+        swap2 := addmod(addmod(mulmod(state0, M02, F), mulmod(state1, M12, F), F), mulmod(state2, M22, F), F)
+
+        state0 := addmod(swap0, 0x2e4ef510ff0b6fda5fa940ab4c4380f26a6bcb64d89427b824d6755b5db9e30c, F)
+        state1 := addmod(swap1, 0x0081c95bc43384e663d79270c956ce3b8925b4f6d033b078b96384f50579400e, F)
+        state2 := addmod(swap2, 0x2ed5f0c91cbd9749187e2fade687e05ee2491b349c039a0bba8a9f4023a0bb38, F)
+
+        p := mulmod(state0, state0, F)
+        state0 := mulmod(mulmod(p, p, F), state0, F)
+
+        swap0 := addmod(addmod(mulmod(state0, M00, F), mulmod(state1, M10, F), F), mulmod(state2, M20, F), F)
+        swap1 := addmod(addmod(mulmod(state0, M01, F), mulmod(state1, M11, F), F), mulmod(state2, M21, F), F)
+        swap2 := addmod(addmod(mulmod(state0, M02, F), mulmod(state1, M12, F), F), mulmod(state2, M22, F), F)
+
+        state0 := addmod(swap0, 0x30509991f88da3504bbf374ed5aae2f03448a22c76234c8c990f01f33a735206, F)
+        state1 := addmod(swap1, 0x1c3f20fd55409a53221b7c4d49a356b9f0a1119fb2067b41a7529094424ec6ad, F)
+        state2 := addmod(swap2, 0x10b4e7f3ab5df003049514459b6e18eec46bb2213e8e131e170887b47ddcb96c, F)
+
+        p := mulmod(state0, state0, F)
+        state0 := mulmod(mulmod(p, p, F), state0, F)
+
+        swap0 := addmod(addmod(mulmod(state0, M00, F), mulmod(state1, M10, F), F), mulmod(state2, M20, F), F)
+        swap1 := addmod(addmod(mulmod(state0, M01, F), mulmod(state1, M11, F), F), mulmod(state2, M21, F), F)
+        swap2 := addmod(addmod(mulmod(state0, M02, F), mulmod(state1, M12, F), F), mulmod(state2, M22, F), F)
+
+        state0 := addmod(swap0, 0x2a1982979c3ff7f43ddd543d891c2abddd80f804c077d775039aa3502e43adef, F)
+        state1 := addmod(swap1, 0x1c74ee64f15e1db6feddbead56d6d55dba431ebc396c9af95cad0f1315bd5c91, F)
+        state2 := addmod(swap2, 0x07533ec850ba7f98eab9303cace01b4b9e4f2e8b82708cfa9c2fe45a0ae146a0, F)
+
+        p := mulmod(state0, state0, F)
+        state0 := mulmod(mulmod(p, p, F), state0, F)
+
+        swap0 := addmod(addmod(mulmod(state0, M00, F), mulmod(state1, M10, F), F), mulmod(state2, M20, F), F)
+        swap1 := addmod(addmod(mulmod(state0, M01, F), mulmod(state1, M11, F), F), mulmod(state2, M21, F), F)
+        swap2 := addmod(addmod(mulmod(state0, M02, F), mulmod(state1, M12, F), F), mulmod(state2, M22, F), F)
+
+        state0 := addmod(swap0, 0x21576b438e500449a151e4eeaf17b154285c68f42d42c1808a11abf3764c0750, F)
+        state1 := addmod(swap1, 0x2f17c0559b8fe79608ad5ca193d62f10bce8384c815f0906743d6930836d4a9e, F)
+        state2 := addmod(swap2, 0x2d477e3862d07708a79e8aae946170bc9775a4201318474ae665b0b1b7e2730e, F)
+
+        p := mulmod(state0, state0, F)
+        state0 := mulmod(mulmod(p, p, F), state0, F)
+
+        swap0 := addmod(addmod(mulmod(state0, M00, F), mulmod(state1, M10, F), F), mulmod(state2, M20, F), F)
+        swap1 := addmod(addmod(mulmod(state0, M01, F), mulmod(state1, M11, F), F), mulmod(state2, M21, F), F)
+        swap2 := addmod(addmod(mulmod(state0, M02, F), mulmod(state1, M12, F), F), mulmod(state2, M22, F), F)
+
+        state0 := addmod(swap0, 0x162f5243967064c390e095577984f291afba2266c38f5abcd89be0f5b2747eab, F)
+        state1 := addmod(swap1, 0x2b4cb233ede9ba48264ecd2c8ae50d1ad7a8596a87f29f8a7777a70092393311, F)
+        state2 := addmod(swap2, 0x2c8fbcb2dd8573dc1dbaf8f4622854776db2eece6d85c4cf4254e7c35e03b07a, F)
+
+        p := mulmod(state0, state0, F)
+        state0 := mulmod(mulmod(p, p, F), state0, F)
+
+        swap0 := addmod(addmod(mulmod(state0, M00, F), mulmod(state1, M10, F), F), mulmod(state2, M20, F), F)
+        swap1 := addmod(addmod(mulmod(state0, M01, F), mulmod(state1, M11, F), F), mulmod(state2, M21, F), F)
+        swap2 := addmod(addmod(mulmod(state0, M02, F), mulmod(state1, M12, F), F), mulmod(state2, M22, F), F)
+
+        state0 := addmod(swap0, 0x1d6f347725e4816af2ff453f0cd56b199e1b61e9f601e9ade5e88db870949da9, F)
+        state1 := addmod(swap1, 0x204b0c397f4ebe71ebc2d8b3df5b913df9e6ac02b68d31324cd49af5c4565529, F)
+        state2 := addmod(swap2, 0x0c4cb9dc3c4fd8174f1149b3c63c3c2f9ecb827cd7dc25534ff8fb75bc79c502, F)
+
+        p := mulmod(state0, state0, F)
+        state0 := mulmod(mulmod(p, p, F), state0, F)
+
+        mstore(0, addmod(addmod(mulmod(state0, M00, F), mulmod(state1, M10, F), F), mulmod(state2, M20, F), F))
+        mstore(0x20, addmod(addmod(mulmod(state0, M01, F), mulmod(state1, M11, F), F), mulmod(state2, M21, F), F))
+        mstore(0x80, addmod(addmod(mulmod(state0, M02, F), mulmod(state1, M12, F), F), mulmod(state2, M22, F), F))
+      }
 
       pRound(
         0x174ad61a1448c899a25416474f4930301e5c49475279e0639a616ddc45bc7b54,
