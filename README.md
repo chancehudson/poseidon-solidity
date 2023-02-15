@@ -23,7 +23,7 @@ import "poseidon-solidity/PoseidonT3.sol";
 
 contract Example {
   function hashInput(uint input0, uint input1) public {
-    PoseidonT3.poseidon([input0, input1]);
+    PoseidonT3.hash([input0, input1]);
   }
 }
 ```

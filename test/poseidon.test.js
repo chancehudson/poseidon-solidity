@@ -12,7 +12,7 @@ describe('PoseidonT3', function () {
     const Poseidon = await ethers.getContractFactory('PoseidonT3')
     const _poseidon = await Poseidon.deploy()
     console.log('soldity implementation:')
-    const h = await test.benchmark(_poseidon.address)
+    const h = await test.benchmarkA(_poseidon.address)
     assert.equal(h.toString(), poseidon([2, 1]).toString())
     assert.equal(h.toString(), poseidon_slow([2, 1]).toString())
   })
@@ -27,7 +27,7 @@ describe('PoseidonT3', function () {
     const c = await f.deploy()
     await c.deployed()
     console.log('iden3 implementation:')
-    await test.benchmark(c.address)
+    await test.benchmarkB(c.address)
   })
 
   it('should check many random elements', async () => {
@@ -37,7 +37,7 @@ describe('PoseidonT3', function () {
     for (let x = 0; x < 10; x++) {
       const i0 = Math.floor(Math.random() * 100000000)
       const i1 = Math.floor(Math.random() * 100000000)
-      const h = await _poseidon.poseidon([i0,i1])
+      const h = await _poseidon.hash([i0,i1])
       assert.equal(h.toString(), poseidon([i0, i1]).toString())
       assert.equal(h.toString(), poseidon_slow([i0, i1]).toString())
     }
