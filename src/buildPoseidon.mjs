@@ -134,12 +134,6 @@ function fRound(${Array(T)
   f += `
 }
 
-// we're assuming that 0x80 is usable as scratch memory
-// make sure we're not overwriting another functions memory
-if eq(eq(inputs, 0x80), 0) {
-  revert(0, 0)
-}
-
 // scratch variable for exponentiation
 let p
 `

@@ -75,12 +75,6 @@ library PoseidonT4 {
         mstore(0xa0, addmod(addmod(addmod(mulmod(state0, M03, F), mulmod(state1, M13, F), F), mulmod(state2, M23, F), F), mulmod(state3, M33, F), F))
       }
 
-      // we're assuming that 0x80 is usable as scratch memory
-      // make sure we're not overwriting another functions memory
-      if eq(eq(inputs, 0x80), 0) {
-        revert(0, 0)
-      }
-
       // scratch variable for exponentiation
       let p
 
