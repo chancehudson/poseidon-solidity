@@ -1,6 +1,32 @@
-# poseidon solidity
+# poseidon-solidity [![CircleCI](https://img.shields.io/circleci/build/github/vimwitch/poseidon-solidity/main)](https://dl.circleci.com/status-badge/redirect/gh/vimwitch/poseidon-solidity/tree/main)
 
-PoseidonT3 implementation in solidity.
+PoseidonT3 (2 inputs) implementation in solidity over BN254.
+
+**This implementation has not been audited.**
+
+## Benchmark
+
+```
+Deploy cost
+  - poseidon-solidity: 2,333,415 gas
+  - circomlibjs opcodes: 2,156,516 gas
+
+Hash cost
+  - poseidon-solidity: 29,893 gas
+  - circomlibjs opcodes: 32,173 gas
+```
+
+## Use
+
+```solidity
+import "poseidon-solidity/PoseidonT3.sol";
+
+contract Example {
+  function hashInput(uint input0, uint input1) public {
+    PoseidonT3.poseidon([input0, input1]);
+  }
+}
+```
 
 ## Testing
 
@@ -9,18 +35,8 @@ npm install
 npm test
 ```
 
-## Benchmark
-
-Deploy cost
-
-```
-solidity - 2,333,415 gas
-raw opcodes - 2,156,516 gas
-```
-
-Hash cost
-
-```
-solidity - 29,893 gas
-raw opcodes - 32,173 gas
-```
+<div align="center">
+<a href="https://appliedzkp.org">
+<img src="https://raw.githubusercontent.com/vimwitch/poseidon-solidity/main/pse_logo.svg" />
+</a>
+</div>

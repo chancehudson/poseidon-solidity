@@ -1,13 +1,18 @@
 {
-  "name": "poseidon-sol",
+  "name": "poseidon-solidity",
   "version": "0.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Poseidon hash function implemented in Solidity",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vimwitch/poseidon-solidity.git"
+  },
+  "keywords": ["poseidon", "solidity", "zk", "ethereum"],
   "scripts": {
+    "pre": "node scripts/pre.mjs",
     "build": "hardhat compile",
     "test": "hardhat test"
   },
-  "author": "vimwitch",
+  "author": "Chance Hudson",
   "license": "MIT",
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.2.2",
