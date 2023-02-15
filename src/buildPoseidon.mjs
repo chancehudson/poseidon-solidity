@@ -21,7 +21,7 @@ const toHex = (n) => '0x' + BigInt(n).toString(16)
 const buildMixSteps = (T) => {
   let f = ''
   for (let x = 0; x < T; x++) {
-    const mem = x < 2 ? toHex(32 * x) : toHex(128 + 32 * x)
+    const mem = x < 2 ? toHex(32 * x) : toHex(128 + 32 * (x - 2))
     f += `mstore(${mem}, `
     const addCount = T - 1
     for (let y = 0; y < addCount; y++) {
@@ -98,7 +98,7 @@ function pRound(${Array(T)
     .join(', ')}) {
 `
   for (let x = 0; x < T; x++) {
-    const mem = x < 2 ? toHex(32 * x) : toHex(128 + 32 * x)
+    const mem = x < 2 ? toHex(32 * x) : toHex(128 + 32 * (x-2))
     f += `let state${x} := addmod(mload(${mem}), c${x}, F)\n`
   }
 
@@ -116,7 +116,7 @@ function fRound(${Array(T)
     .join(', ')}) {
 `
   for (let x = 0; x < T; x++) {
-    const mem = x < 2 ? toHex(32 * x) : toHex(128 + 32 * x)
+    const mem = x < 2 ? toHex(32 * x) : toHex(128 + 32 * (x-2))
     f += `let state${x} := addmod(mload(${mem}), c${x}, F)\n`
   }
 
@@ -203,7 +203,7 @@ ${func}(`
   f += `\n{\n`
 
   for (let x = 0; x < T; x++) {
-    const mem = x < 2 ? toHex(32 * x) : toHex(128 + 32 * x)
+    const mem = x < 2 ? toHex(32 * x) : toHex(128 + 32 * (x-2))
     f += `let state${x} := addmod(mload(${mem}), ${C[r * T + x]}, F)\n`
   }
 
