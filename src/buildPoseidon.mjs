@@ -16,37 +16,54 @@ const _ROUNDS_P = [
 const F =
   '21888242871839275222246405745257275088548364400416034343698204186575808495617'
 
+const MAX_ARGS = 5
+
 const toHex = (n) => '0x' + BigInt(n).toString(16)
+
+const mul = (v1, v2) => `mulmod(${v1}, ${v2}, F)`
+const add = (v1, v2) => `addmod(${v1}, ${v2}, F)`
 
 const buildMixSteps = (T) => {
   let f = ''
+  const unusedMemOffset = 128 + 32 * (T - 2)
   for (let x = 0; x < T; x++) {
     const mem = x < 2 ? toHex(32 * x) : toHex(128 + 32 * (x - 2))
-    f += `mstore(${mem}, `
-    const addCount = T - 1
-    for (let y = 0; y < addCount; y++) {
-      f += `addmod(`
-    }
-    for (let y = 0; y < T; y++) {
-      f += `mulmod(state${y}, M${y}${x}, F), `
-      if (y === T - 1) {
-        f += `F)`
-        continue
-      }
-      if (y % 2 === 1) {
-        f += `F)`
-        if (y <= T - 1) {
-          f += ', '
+    const muls = Array(T)
+      .fill()
+      .map((_, i) => {
+        if (i < MAX_ARGS) {
+          return mul(`state${i}`, `M${i}${x}`)
+        } else {
+          return mul(
+            `mload(${toHex(unusedMemOffset + 32 * (i - MAX_ARGS))})`,
+            `M${i}${x}`
+          )
+        }
+      })
+    if (T > MAX_ARGS) {
+      // split into two additions
+      let _add = add(muls.shift(), muls.shift())
+      _add = add(_add, muls.shift())
+      _add = add(_add, muls.shift())
+      f += `p := ${_add}\n`
+
+      _add = add(muls.shift(), muls.shift())
+      for (let y = 0; y < muls.length + 1; y++) {
+        if (y === muls.length) {
+          _add = add(_add, `p`)
+        } else {
+          _add = add(_add, muls[y])
         }
       }
-      if (y >= 1 && y % 2 === 0) {
-        f += `F)`
-        if (y <= T - 1) {
-          f += ', '
-        }
+      f += `mstore(${mem}, ${_add})\n`
+    } else {
+      // one addition
+      let _add = add(muls.shift(), muls.shift())
+      for (let y = 0; y < muls.length; y++) {
+        _add = add(_add, muls[y])
       }
+      f += `mstore(${mem}, ${_add})\n`
     }
-    f += `)\n`
   }
   return f
 }
@@ -55,6 +72,7 @@ export function genTContract(T) {
   const C = constants.C[T - 2]
   const M = constants.M[T - 2]
   const ROUNDS_P = _ROUNDS_P[T - 2]
+  const unusedMemOffset = 128 + 32 * (T - 2)
 
   let f = `/// SPDX-License-Identifier: MIT
 pragma solidity >=0.7.0;
@@ -92,14 +110,19 @@ assembly {
 // state3 - 0xa0
 // state4 - ...
 
-function pRound(${Array(T)
+function pRound(${Array(Math.min(T, MAX_ARGS))
     .fill(null)
     .map((_, i) => `c${i}`)
     .join(', ')}) {
 `
   for (let x = 0; x < T; x++) {
-    const mem = x < 2 ? toHex(32 * x) : toHex(128 + 32 * (x-2))
-    f += `let state${x} := addmod(mload(${mem}), c${x}, F)\n`
+    const mem = x < 2 ? toHex(32 * x) : toHex(128 + 32 * (x - 2))
+    if (x < MAX_ARGS) {
+      f += `let state${x} := addmod(mload(${mem}), c${x}, F)\n`
+    } else {
+      const _mem = toHex(unusedMemOffset + 32 * (x - MAX_ARGS))
+      f += `mstore(${_mem}, addmod(mload(${mem}), mload(${_mem}), F))\n`
+    }
   }
 
   f += `
@@ -110,21 +133,37 @@ function pRound(${Array(T)
   ${buildMixSteps(T)}
 }
 
-function fRound(${Array(T)
+function fRound(${Array(Math.min(T, MAX_ARGS))
     .fill(null)
     .map((_, i) => `c${i}`)
     .join(', ')}) {
 `
+  // for (let x = 0; x < T; x++) {
+  //   const mem = x < 2 ? toHex(32 * x) : toHex(128 + 32 * (x-2))
+  //   f += `let state${x} := addmod(mload(${mem}), c${x}, F)\n`
+  // }
   for (let x = 0; x < T; x++) {
-    const mem = x < 2 ? toHex(32 * x) : toHex(128 + 32 * (x-2))
-    f += `let state${x} := addmod(mload(${mem}), c${x}, F)\n`
+    const mem = x < 2 ? toHex(32 * x) : toHex(128 + 32 * (x - 2))
+    if (x < MAX_ARGS) {
+      f += `let state${x} := addmod(mload(${mem}), c${x}, F)\n`
+    } else {
+      const _mem = toHex(unusedMemOffset + 32 * (x - MAX_ARGS))
+      f += `mstore(${_mem}, addmod(mload(${mem}), mload(${_mem}), F))\n`
+    }
   }
 
   f += '\n'
 
   for (let x = 0; x < T; x++) {
-    f += `${x === 0 ? 'let ' : ''}p := mulmod(state${x}, state${x}, F)\n`
-    f += `state${x} := mulmod(mulmod(p, p, F), state${x}, F)\n`
+    if (x < MAX_ARGS) {
+      f += `${x === 0 ? 'let ' : ''}p := mulmod(state${x}, state${x}, F)\n`
+      f += `state${x} := mulmod(mulmod(p, p, F), state${x}, F)\n`
+    } else {
+      const mem = toHex(unusedMemOffset + 32 * (x - MAX_ARGS))
+      f += `c0 := mload(${mem})\n`
+      f += `p := mulmod(c0, c0, F)\n`
+      f += `mstore(${mem}, mulmod(mulmod(p, p, F), c0, F))\n`
+    }
   }
 
   f += '\n'
@@ -154,16 +193,28 @@ let p
 
   f += '// load the inputs from memory\n'
 
-  for (let x = 1; x < T; x++) {
+  for (let x = 1; x < Math.min(T, MAX_ARGS); x++) {
     const mem = toHex(128 + 32 * (x - 1))
     f += `let state${x} := addmod(mload(${mem}), ${C[r * T + x]}, F)\n`
+  }
+  for (let x = T; x >= Math.min(T, MAX_ARGS); --x) {
+    const mem = toHex(128 + 32 * (x - 1))
+    const _mem = toHex(unusedMemOffset + 32 * (x - MAX_ARGS))
+    f += `mstore(${_mem}, addmod(mload(${mem}), ${C[r * T + x]}, F))\n`
   }
 
   f += '\n'
 
   for (let x = 1; x < T; x++) {
-    f += `p := mulmod(state${x}, state${x}, F)\n`
-    f += `state${x} := mulmod(mulmod(p, p, F), state${x}, F)\n`
+    if (x < MAX_ARGS) {
+      f += `p := mulmod(state${x}, state${x}, F)\n`
+      f += `state${x} := mulmod(mulmod(p, p, F), state${x}, F)\n`
+    } else {
+      const _mem = toHex(unusedMemOffset + 32 * (x - MAX_ARGS))
+      f += `p := mload(${_mem})\n`
+      f += `p := mulmod(p, p, F)\n`
+      f += `mstore(${_mem}, mulmod(mulmod(p, p, F), mload(${_mem}), F))\n`
+    }
   }
   f += `
 
@@ -183,12 +234,16 @@ let p
   r++
 
   for (; r < ROUNDS_F + ROUNDS_P - 1; r++) {
+    for (let x = MAX_ARGS; x < T; x++) {
+      const mem = toHex(unusedMemOffset + 32 * (x - MAX_ARGS))
+      f += `\nmstore(${mem}, ${C[r * T + x]})\n`
+    }
     const func =
       r < ROUNDS_F / 2 || r >= ROUNDS_F / 2 + ROUNDS_P ? 'fRound' : 'pRound'
     f += `
 ${func}(`
-    for (let x = 0; x < T; x++) {
-      f += `${C[r * T + x]}${x === T - 1 ? '' : ','}\n`
+    for (let x = 0; x < Math.min(T, MAX_ARGS); x++) {
+      f += `${C[r * T + x]}${x === Math.min(T, MAX_ARGS) - 1 ? '' : ','}\n`
     }
     f += `)
 `
@@ -197,27 +252,35 @@ ${func}(`
   f += `\n{\n`
 
   for (let x = 0; x < T; x++) {
-    const mem = x < 2 ? toHex(32 * x) : toHex(128 + 32 * (x-2))
-    f += `let state${x} := addmod(mload(${mem}), ${C[r * T + x]}, F)\n`
+    const mem = x < 2 ? toHex(32 * x) : toHex(128 + 32 * (x - 2))
+    if (x < MAX_ARGS) {
+      f += `let state${x} := addmod(mload(${mem}), ${C[r * T + x]}, F)\n`
+    } else {
+      const _mem = toHex(unusedMemOffset + 32 * (x - MAX_ARGS))
+      f += `mstore(${_mem}, addmod(mload(${mem}), ${C[r * T + x]}, F))\n`
+    }
   }
 
   f += '\n'
 
   for (let x = 0; x < T; x++) {
-    f += `p := mulmod(state${x}, state${x}, F)\n`
-    f += `state${x} := mulmod(mulmod(p, p, F), state${x}, F)\n`
+    if (x < MAX_ARGS) {
+      f += `p := mulmod(state${x}, state${x}, F)\n`
+      f += `state${x} := mulmod(mulmod(p, p, F), state${x}, F)\n`
+    } else {
+      const mem = toHex(unusedMemOffset + 32 * (x - MAX_ARGS))
+      f += `p := mload(${mem})\n`
+      f += `p := mulmod(p, p, F)\n`
+      f += `mstore(${mem}, mulmod(mulmod(p, p, F), ${`mload(${mem})`}, F))\n`
+    }
   }
-  const lastMix = buildMixSteps(T)
-    .split('\n')[0]
-    .replace('mstore(0x0, ', '')
-    .slice(0, -1)
+  let lastMix = buildMixSteps(T).split('\n')[0]
+  if (T > MAX_ARGS) {
+    lastMix = buildMixSteps(T).split('\n').slice(0, 2).join('\n')
+  }
 
   f += `
-
-  mstore(
-    0,
-    ${lastMix}
-  )
+  ${lastMix}
   return(0, 0x20)
 }
 }

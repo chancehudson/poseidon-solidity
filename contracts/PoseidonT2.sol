@@ -57,6 +57,7 @@ library PoseidonT2 {
       {
         // load the inputs from memory
         let state1 := addmod(mload(0x80), 0x0c0356530896eec42a97ed937f3135cfc5142b3ae405b8343c1d83ffa604cb81, F)
+        mstore(0x20, addmod(mload(0xa0), 0x1e28a1d935698ad1142e51182bb54cf4a00ea5aabd6268bd317ea977cc154a30, F))
 
         p := mulmod(state1, state1, F)
         state1 := mulmod(mulmod(p, p, F), state1, F)
@@ -200,7 +201,7 @@ library PoseidonT2 {
         p := mulmod(state1, state1, F)
         state1 := mulmod(mulmod(p, p, F), state1, F)
 
-        mstore(0, addmod(mulmod(state0, M00, F), mulmod(state1, M10, F), F))
+        mstore(0x0, addmod(mulmod(state0, M00, F), mulmod(state1, M10, F), F))
         return(0, 0x20)
       }
     }

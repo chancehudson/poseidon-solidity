@@ -22,25 +22,26 @@ for (const t of T) {
         .fill()
         .map((_, i) => i + 1)
       const h = await test[`benchmarkA${t}`](_poseidon.address, input)
-      assert.equal(h.toString(), poseidon(input).toString())
       assert.equal(h.toString(), poseidon_slow(input).toString())
+      assert.equal(h.toString(), poseidon(input).toString())
     })
-
-    it('should check against iden3 impl', async () => {
-      const bytecode = poseidon_gencontract.createCode(t - 1)
-      const abi = poseidon_gencontract.generateABI(t - 1)
-      const [owner] = await ethers.getSigners()
-      const Test = await ethers.getContractFactory('Test')
-      const test = await Test.deploy()
-      const f = new ethers.ContractFactory(abi, bytecode, owner)
-      const c = await f.deploy()
-      await c.deployed()
-      console.log('iden3 implementation:')
-      const input = Array(t - 1)
-        .fill()
-        .map((_, i) => i + 1)
-      await test[`benchmarkB${t}`](c.address, input)
-    })
+    if (t < 7) {
+      it('should check against iden3 impl', async () => {
+        const bytecode = poseidon_gencontract.createCode(t - 1)
+        const abi = poseidon_gencontract.generateABI(t - 1)
+        const [owner] = await ethers.getSigners()
+        const Test = await ethers.getContractFactory('Test')
+        const test = await Test.deploy()
+        const f = new ethers.ContractFactory(abi, bytecode, owner)
+        const c = await f.deploy()
+        await c.deployed()
+        console.log('iden3 implementation:')
+        const input = Array(t - 1)
+          .fill()
+          .map((_, i) => i + 1)
+        await test[`benchmarkB${t}`](c.address, input)
+      })
+    }
 
     it('should check many random elements', async () => {
       const [owner] = await ethers.getSigners()

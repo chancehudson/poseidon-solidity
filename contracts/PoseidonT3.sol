@@ -69,6 +69,7 @@ library PoseidonT3 {
         // load the inputs from memory
         let state1 := addmod(mload(0x80), 0x00f1445235f2148c5986587169fc1bcd887b08d4d00868df5696fff40956e864, F)
         let state2 := addmod(mload(0xa0), 0x08dff3487e8ac99e1f29a058d0fa80b930c728730b7ab36ce879f3890ecf73f5, F)
+        mstore(0x60, addmod(mload(0xc0), 0x2f27be690fdaee46c3ce28f7532b13c856c35342c84bda6e20966310fadc01d0, F))
 
         p := mulmod(state1, state1, F)
         state1 := mulmod(mulmod(p, p, F), state1, F)
@@ -472,7 +473,7 @@ library PoseidonT3 {
         p := mulmod(state2, state2, F)
         state2 := mulmod(mulmod(p, p, F), state2, F)
 
-        mstore(0, addmod(addmod(mulmod(state0, M00, F), mulmod(state1, M10, F), F), mulmod(state2, M20, F), F))
+        mstore(0x0, addmod(addmod(mulmod(state0, M00, F), mulmod(state1, M10, F), F), mulmod(state2, M20, F), F))
         return(0, 0x20)
       }
     }

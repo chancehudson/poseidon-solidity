@@ -129,6 +129,7 @@ library PoseidonT5 {
         let state2 := addmod(mload(0xa0), 0x2f83b9df259b2b68bcd748056307c37754907df0c0fb0035f5087c58d5e8c2d4, F)
         let state3 := addmod(mload(0xc0), 0x2ca70e2e8d7f39a12447ac83052451b461f15f8b41a75ef31915208f5aba9683, F)
         let state4 := addmod(mload(0xe0), 0x1cb5f9319be6a45e91b04d7222271c94994196f12ed22c5d4ec719cb83ecfea9, F)
+        mstore(0xe0, addmod(mload(0x100), 0x2eb4f99c69f966ebf8a42192de7ff61621c7bb47b93750c2b9ea08d18446c122, F))
 
         p := mulmod(state1, state1, F)
         state1 := mulmod(mulmod(p, p, F), state1, F)
@@ -750,7 +751,7 @@ library PoseidonT5 {
         state4 := mulmod(mulmod(p, p, F), state4, F)
 
         mstore(
-          0,
+          0x0,
           addmod(addmod(addmod(addmod(mulmod(state0, M00, F), mulmod(state1, M10, F), F), mulmod(state2, M20, F), F), mulmod(state3, M30, F), F), mulmod(state4, M40, F), F)
         )
         return(0, 0x20)
