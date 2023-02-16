@@ -1,5 +1,6 @@
 /** @type import('hardhat/config').HardhatUserConfig */
 require('@nomiclabs/hardhat-ethers')
+require('hardhat-contract-sizer')
 
 module.exports = {
   solidity: {

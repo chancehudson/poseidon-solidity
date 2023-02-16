@@ -1,6 +1,6 @@
 {
   "name": "poseidon-solidity",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Poseidon hash function implemented in Solidity",
   "repository": {
     "type": "git",
@@ -18,6 +18,7 @@
     "pre": "node scripts/pre.mjs",
     "build": "node src/build.mjs && hardhat compile",
     "compile": "hardhat compile",
+    "size": "hardhat size-contracts",
     "test": "hardhat test"
   },
   "author": "Chance Hudson",
@@ -29,7 +30,8 @@
     "hardhat": "^2.12.7",
     "poseidon-lite": "^0.0.2",
     "prettier": "^2.8.4",
-    "prettier-plugin-solidity": "^1.1.2"
+    "prettier-plugin-solidity": "^1.1.2",
+    "hardhat-contract-sizer": "^2.8.0"
   },
   "prettier": {
     "tabWidth": 2,

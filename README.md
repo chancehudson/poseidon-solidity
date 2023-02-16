@@ -26,6 +26,10 @@ Hash cost (T4)
 Hash cost (T5)
   - poseidon-solidity: 65,085 gas
   - circomlibjs: 73,307 gas
+
+Hash cost (T6)
+  - poseidon-solidity: 94,583 gas
+  - circomlibjs: 10,0197 gas
 ```
 
 ## Use
