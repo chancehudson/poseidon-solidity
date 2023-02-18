@@ -11,7 +11,7 @@ library PoseidonT2 {
 
   // See here for a simplified implementation: https://github.com/vimwitch/poseidon-solidity/blob/e57becdabb65d99fdc586fe1e1e09e7108202d53/contracts/Poseidon.sol#L40
   // Based on: https://github.com/iden3/circomlibjs/blob/v0.0.8/src/poseidon_slow.js
-  function hash(uint[1] memory inputs) public pure returns (uint) {
+  function hash(uint[1] memory) public pure returns (uint) {
     assembly {
       // memory 0x00 to 0x3f (64 bytes) is scratch space for hash algos
       // we can use it in inline assembly because we're not calling e.g. keccak
