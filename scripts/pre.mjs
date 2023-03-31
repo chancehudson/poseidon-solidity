@@ -22,6 +22,7 @@ await fs.mkdir(buildDir)
 await fs.writeFile(path.join(buildDir, 'package.json'), JSON.stringify(finalPackage))
 
 await fs.cp(path.join(__dirname, '../contracts'), buildDir, { recursive: true })
+await fs.cp(path.join(__dirname, '../src/hardhat.js'), path.join(buildDir, 'hardhat.js'), { recursive: false })
 await fs.rm(path.join(buildDir, 'Test.sol'))
 
 await fs.cp(path.join(__dirname, '../README.md'), path.join(buildDir, 'README.md'))
