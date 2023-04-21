@@ -12,11 +12,11 @@ Deploy cost (T3)
   - circomlibjs: 2,156,516 gas
 
 Hash cost (T2)
-  - poseidon-solidity: 18,614 gas
+  - poseidon-solidity: 15,548 gas
   - circomlibjs: 19,395 gas
 
 Hash cost (T3)
-  - poseidon-solidity: 29,893 gas
+  - poseidon-solidity: 25,806 gas
   - circomlibjs: 32,173 gas
 
 Hash cost (T4)

@@ -2,7 +2,8 @@ const { ethers } = require('hardhat')
 const { poseidon_slow, poseidon_gencontract } = require('circomlibjs')
 const poseidon = require('poseidon-lite')
 const assert = require('assert')
-const T = require('../src/T')
+
+const T = [2, 3, 4, 5, 6]
 
 const F_MAX =
   BigInt(
