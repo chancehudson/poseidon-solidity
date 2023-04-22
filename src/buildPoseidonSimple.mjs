@@ -21,7 +21,8 @@ const MAX_ARGS = 5
 const toHex = (n) => '0x' + BigInt(n).toString(16)
 
 const mul = (v1, v2) => `mulmod(${v1}, ${v2}, F)`
-const add = (v1, v2) => `addmod(${v1}, ${v2}, F)`
+const addmod = (v1, v2) => `addmod(${v1}, ${v2}, F)`
+const add = (v1, v2) => `add(${v1}, ${v2})`
 
 const mix = (T, state, x, _M) => {
   const muls = Array(T)
@@ -37,6 +38,19 @@ const mix = (T, state, x, _M) => {
   return _add
 }
 
+const finalMix = (T, state, x) => {
+  const muls = Array(T)
+    .fill()
+    .map((_, i) => {
+      return mul(`${state}${i}`, `M${i}${x}`)
+    })
+  let _add = add(muls.shift(), muls.shift())
+  for (let y = 0; y < muls.length; y++) {
+    _add = add(_add, muls[y])
+  }
+  return `mod(${_add}, F)`
+}
+
 export function genTContractSimple(T, options = {}) {
   //*****
   // build settings
@@ -48,7 +62,7 @@ export function genTContractSimple(T, options = {}) {
   // affects contract size
   const mStackCount = options.mStackCount ?? 3
   // Premultiply/exponentiate the first round state 0 variable
-  const premultiplyState0 = options.premultiplState0 ?? true
+  const premultiplyState0 = options.premultiplyState0 ?? true
   //*****
 
   const C = constants.C[T - 2]
@@ -130,7 +144,7 @@ assembly {
         f += `${scratch}${y} := ${add(C[(r + 1) * T + y], m)}\n`
       } else if (compressMixAdd) {
         f += '\n'
-        f += `mstore(0x0, ${m})\n`
+        f += `mstore(0x0, ${finalMix(T, state, y)})\n`
       } else {
         f += `${scratch}${y} := ${m}\n`
       }
@@ -138,7 +152,7 @@ assembly {
   }
 
   if (!compressMixAdd) {
-    f += `mstore(0x0, ${r % 2 === 0 ? 'state0' : 'scratch0'})\n`
+    f += `mstore(0x0, mod(${r % 2 === 0 ? 'state0' : 'scratch0'}, F))\n`
   }
   f += `
   return (0, 0x20)

@@ -11,7 +11,10 @@ export default [
   },
   {
     T: 3,
-    build: () => genTContractSimple(3),
+    build: () =>
+      genTContractSimple(3, {
+        mStackCount: 3,
+      }),
   },
   {
     T: 4,
