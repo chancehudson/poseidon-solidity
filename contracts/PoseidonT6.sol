@@ -189,7 +189,6 @@ library PoseidonT6 {
         let state3 := add(mod(mload(0xc0), F), 0x2bc6b0ddbe1d701b6570428bdc1ca1bf0da59ff3bbbb95fc2bc71c0c6e67a65c)
         let state4 := add(mod(mload(0xe0), F), 0x123a55a31980384f3d20b2cecbc44ed60c38c11f7d20e9271efab9a905eefd3c)
         let state5 := add(mod(mload(0x100), F), 0x037501cc8c9dc819309a769f4df098e588b01858bc8eb7e279e2883be9fb8c53)
-        mstore(0xe0, add(mod(mload(0x120), F), 0x1c2116e47e03a86bb11695b0a5f6dab6b9a460b1eb951ab01c259eca3fd47d51))
 
         p := mulmod(state1, state1, F)
         state1 := mulmod(mulmod(p, p, F), state1, F)

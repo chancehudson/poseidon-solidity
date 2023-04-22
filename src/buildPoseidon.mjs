@@ -223,6 +223,8 @@ let p
     f += `let state${x} := add(mod(mload(${mem}), F), ${C[r * T + x]})\n`
   }
   for (let x = T; x >= Math.min(T, MAX_ARGS); --x) {
+    // TODO: fix this for higher arity hashes
+    if (true) break
     const mem = toHex(128 + 32 * (x - 1))
     const _mem = toHex(unusedMemOffset + 32 * (x - MAX_ARGS))
     f += `mstore(${_mem}, add(mod(mload(${mem}), F), ${C[r * T + x]}))\n`

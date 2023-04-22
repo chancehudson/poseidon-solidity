@@ -16,15 +16,15 @@ T3 hash
   - circomlibjs: 32,173 gas
 
 T4 hash
-  - poseidon-solidity: 37,643 gas
+  - poseidon-solidity: 37,617 gas
   - circomlibjs: 48,267 gas
 
 T5 hash
-  - poseidon-solidity: 54,352 gas
+  - poseidon-solidity: 54,326 gas
   - circomlibjs: 73,307 gas
 
 T6 hash
-  - poseidon-solidity: 74,065 gas
+  - poseidon-solidity: 74,039 gas
   - circomlibjs: 100,197 gas
 
 # ---
