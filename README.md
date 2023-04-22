@@ -7,25 +7,27 @@ Poseidon implementation in Solidity over alt_bn128 (aka BN254).
 ## Benchmark
 
 ```yaml
-Hash cost (T2)
+T2 hash
   - poseidon-solidity: 13,488 gas
   - circomlibjs: 19,395 gas
 
-Hash cost (T3)
+T3 hash
   - poseidon-solidity: 21,124 gas
   - circomlibjs: 32,173 gas
 
-Hash cost (T4)
+T4 hash
   - poseidon-solidity: 37,643 gas
   - circomlibjs: 48,267 gas
 
-Hash cost (T5)
+T5 hash
   - poseidon-solidity: 54,352 gas
   - circomlibjs: 73,307 gas
 
-Hash cost (T6)
+T6 hash
   - poseidon-solidity: 74,065 gas
   - circomlibjs: 100,197 gas
+
+# ---
 
 Deploy cost (T3)
   - poseidon-solidity: 5,129,638 gas
