@@ -15,18 +15,23 @@ for (const t of T) {
     const Poseidon = await ethers.getContractFactory(`PoseidonT${t}`)
     if (process.env.CI || process.env.DEPLOY) {
       const deployInfo = require(`../deploy/PoseidonT${t}`)
-      if ((await ethers.provider.getCode(deployInfo.address)) !== '0x') {
-        return Poseidon.attach(deployInfo.address)
+      if ((await ethers.provider.getCode(deployInfo.proxyAddress)) === '0x') {
+        await owner.sendTransaction({
+          to: deployInfo.from,
+          value: deployInfo.gas,
+        })
+        await ethers.provider.sendTransaction(deployInfo.tx)
       }
-      await owner.sendTransaction({
-        to: deployInfo.from,
-        value: deployInfo.gas,
-      })
-      const tx = await ethers.provider.sendTransaction(deployInfo.tx)
-      const receipt = await tx.wait()
-      console.log(
-        `Cost of deploying T${t} (poseidon-solidity): ${receipt.gasUsed.toString()}`
-      )
+      if ((await ethers.provider.getCode(deployInfo.address)) === '0x') {
+        const tx = await owner.sendTransaction({
+          to: deployInfo.proxyAddress,
+          data: deployInfo.data,
+        })
+        const receipt = await tx.wait()
+        console.log(
+          `Cost of deploying T${t} (poseidon-solidity): ${receipt.gasUsed.toString()}`
+        )
+      }
       return Poseidon.attach(deployInfo.address)
     }
     const _poseidon = await Poseidon.deploy()
