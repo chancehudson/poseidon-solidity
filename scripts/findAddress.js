@@ -12,6 +12,7 @@ const { bytecode } = require(path.join(__dirname, `../artifacts/contracts/${cont
 // seems to give ~50% higher than the actual cost
 const deploymentGas = Math.ceil((bytecode.length * 150) / 100000)*100000
 const gasPrice = 100*10**9
+const totalCost = (BigInt(deploymentGas) * BigInt(gasPrice)).toString()
 
 let r = Number(startR ?? 0)
 for (;;) {
@@ -26,6 +27,7 @@ for (;;) {
 				from: `0x${signerAddress}`,
 				gasLimit: deploymentGas,
 				gasPrice,
+				gas: totalCost,
 				tx: `0x${signedEncodedTransaction}`
 			}
 			fs.writeFile(path.join(__dirname, `../deploy/${contractName}.json`), JSON.stringify(deploy, null, 2))
