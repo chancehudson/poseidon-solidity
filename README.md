@@ -59,9 +59,9 @@ contract Example {
 
 ## Deploy
 
-This package includes config info for deploying with a [deterministic proxy](https://github.com/Arachnid/deterministic-deployment-proxy). The proxy itself is deployed using [Nick's method](https://eips.ethereum.org/EIPS/eip-1820#deployment-method). Thus we get the same address on any EVM based blockchain.
+This package includes config info for deploying with a [deterministic proxy](https://github.com/Arachnid/deterministic-deployment-proxy). The proxy itself is deployed using [Nick's method](https://eips.ethereum.org/EIPS/eip-1820#deployment-method) with a pre-signed transaction from a keyless address. The poseidon contracts are deployed through this proxy to get the same address in any evm.
 
-To deploy in a hardhat type environment:
+To deploy in a hardhat/ethers type environment:
 
 ```js
 const { proxy, PoseidonT3 } = require('poseidon-solidity')
