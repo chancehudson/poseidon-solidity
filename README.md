@@ -1,35 +1,35 @@
 # poseidon-solidity [![CircleCI](https://img.shields.io/circleci/build/github/vimwitch/poseidon-solidity/main)](https://dl.circleci.com/status-badge/redirect/gh/vimwitch/poseidon-solidity/tree/main)
 
-Poseidon implementation in Solidity over BN254.
+Poseidon implementation in Solidity over alt_bn128 (aka BN254).
 
 **This implementation has not been audited.**
 
 ## Benchmark
 
 ```
-Deploy cost (T3)
-  - poseidon-solidity: 2,333,415 gas
-  - circomlibjs: 2,156,516 gas
-
 Hash cost (T2)
-  - poseidon-solidity: 15,548 gas
+  - poseidon-solidity: 13,488 gas
   - circomlibjs: 19,395 gas
 
 Hash cost (T3)
-  - poseidon-solidity: 25,806 gas
+  - poseidon-solidity: 21,124 gas
   - circomlibjs: 32,173 gas
 
 Hash cost (T4)
-  - poseidon-solidity: 43,696 gas
+  - poseidon-solidity: 37,643 gas
   - circomlibjs: 48,267 gas
 
 Hash cost (T5)
-  - poseidon-solidity: 65,085 gas
+  - poseidon-solidity: 54,352 gas
   - circomlibjs: 73,307 gas
 
 Hash cost (T6)
-  - poseidon-solidity: 94,583 gas
-  - circomlibjs: 10,0197 gas
+  - poseidon-solidity: 74,065 gas
+  - circomlibjs: 100,197 gas
+
+Deploy cost (T3)
+  - poseidon-solidity: 5,129,638 gas
+  - circomlibjs: 2,156,516 gas
 ```
 
 ## Use
