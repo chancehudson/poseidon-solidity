@@ -18,6 +18,12 @@ for (const t of T) {
       const test = await Test.deploy()
       const Poseidon = await ethers.getContractFactory(`PoseidonT${t}`)
       const _poseidon = await Poseidon.deploy()
+      if (t === 3) {
+        const receipt = await _poseidon.deployTransaction.wait()
+        console.log(
+          `Cost of deploying T3 (poseidon-solidity): ${receipt.gasUsed.toString()}`
+        )
+      }
       console.log('soldity implementation:')
       const input = Array(t - 1)
         .fill()
@@ -36,6 +42,12 @@ for (const t of T) {
         const f = new ethers.ContractFactory(abi, bytecode, owner)
         const c = await f.deploy()
         await c.deployed()
+        if (t === 3) {
+          const receipt = await c.deployTransaction.wait()
+          console.log(
+            `Cost of deploying T3 (circomlibjs): ${receipt.gasUsed.toString()}`
+          )
+        }
         console.log('iden3 implementation:')
         const input = Array(t - 1)
           .fill()
