@@ -13,8 +13,10 @@
     "ethereum",
     "hash"
   ],
+  "main": "index.js",
+  "types": "index.d.ts",
   "scripts": {
-    "lint": "prettier {test/*,src/*.mjs}",
+    "lint": "prettier {test/*,src/*.mjs,deploy/*.js}",
     "pre": "node scripts/pre.mjs",
     "build": "node src/build.mjs && hardhat compile",
     "compile": "hardhat compile",

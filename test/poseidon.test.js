@@ -12,29 +12,29 @@ const F_MAX =
 
 for (const t of T) {
   const getPoseidon = async (owner) => {
-    try {
-      const deployInfo = require('../deploy/PoseidonT2.json')
+    const Poseidon = await ethers.getContractFactory(`PoseidonT${t}`)
+    if (process.env.CI || process.env.DEPLOY) {
+      const deployInfo = require(`../deploy/PoseidonT${t}`)
+      if ((await ethers.provider.getCode(deployInfo.address)) !== '0x') {
+        return Poseidon.attach(deployInfo.address)
+      }
       await owner.sendTransaction({
         to: deployInfo.from,
-        value: (
-          BigInt(deployInfo.gasLimit) * BigInt(deployInfo.gasPrice)
-        ).toString(),
+        value: deployInfo.gas,
       })
       const tx = await ethers.provider.sendTransaction(deployInfo.tx)
       const receipt = await tx.wait()
       console.log(
         `Cost of deploying T${t} (poseidon-solidity): ${receipt.gasUsed.toString()}`
       )
-      return deployInfo
-    } catch (err) {
-      const Poseidon = await ethers.getContractFactory(`PoseidonT${t}`)
-      const _poseidon = await Poseidon.deploy()
-      const receipt = await _poseidon.deployTransaction.wait()
-      console.log(
-        `Cost of deploying T${t} (poseidon-solidity): ${receipt.gasUsed.toString()}`
-      )
-      return _poseidon
+      return Poseidon.attach(deployInfo.address)
     }
+    const _poseidon = await Poseidon.deploy()
+    const receipt = await _poseidon.deployTransaction.wait()
+    console.log(
+      `Cost of deploying T${t} (poseidon-solidity): ${receipt.gasUsed.toString()}`
+    )
+    return _poseidon
   }
   describe(`PoseidonT${t}`, function () {
     it('should hash elements', async () => {
@@ -77,7 +77,7 @@ for (const t of T) {
 
     it('should check many random elements', async () => {
       const [owner] = await ethers.getSigners()
-      const _poseidon = await getPoseidon()
+      const _poseidon = await getPoseidon(owner)
       for (let x = 0; x < 10; x++) {
         const input = Array(t - 1)
           .fill()
@@ -90,7 +90,7 @@ for (const t of T) {
 
     it('should correctly hash edge inputs', async () => {
       const [owner] = await ethers.getSigners()
-      const _poseidon = await getPoseidon()
+      const _poseidon = await getPoseidon(owner)
       {
         const input = Array(t - 1).fill(0)
         const h = await _poseidon.hash(input)
@@ -107,7 +107,7 @@ for (const t of T) {
 
     it('should check overflowed inputs', async () => {
       const [owner] = await ethers.getSigners()
-      const _poseidon = await getPoseidon()
+      const _poseidon = await getPoseidon(owner)
       for (let x = 0; x < 10; x++) {
         const input = Array(t - 1)
           .fill()
