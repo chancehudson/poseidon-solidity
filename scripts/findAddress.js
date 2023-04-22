@@ -18,7 +18,7 @@ for (;;) {
   try {
   	const _r = r.toString().padStart(64,'3')
     const { contractAddress, signerAddress, signedEncodedTransaction } = addressForR(_r)
-		if (r%100===0) console.log(r)
+		if (r%1000===0) console.log(r)
 		if (contractAddress.startsWith(`3330${contractName.slice(-1)}0`)) {
 			const deploy = {
 				address: `0x${contractAddress}`,
