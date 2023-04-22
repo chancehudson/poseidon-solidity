@@ -25,13 +25,16 @@
   "license": "MIT",
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.2.2",
+    "@zoltu/rlp-encoder": "^2.0.6",
     "big-integer": "^1.6.51",
     "circomlibjs": "^0.0.8",
+    "elliptic": "^6.5.4",
     "hardhat": "^2.12.7",
+    "hardhat-contract-sizer": "^2.8.0",
+    "js-sha3": "^0.8.0",
     "poseidon-lite": "^0.0.2",
     "prettier": "^2.8.4",
-    "prettier-plugin-solidity": "^1.1.2",
-    "hardhat-contract-sizer": "^2.8.0"
+    "prettier-plugin-solidity": "^1.1.2"
   },
   "prettier": {
     "tabWidth": 2,
