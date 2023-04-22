@@ -85,7 +85,7 @@ library PoseidonT${T} {
   f += `
 
 // See here for a simplified implementation: https://github.com/vimwitch/poseidon-solidity/blob/e57becdabb65d99fdc586fe1e1e09e7108202d53/contracts/Poseidon.sol#L40
-// Based on: https://github.com/iden3/circomlibjs/blob/v0.0.8/src/poseidon_slow.js
+// Inspired by: https://github.com/iden3/circomlibjs/blob/v0.0.8/src/poseidon_slow.js
 function hash(uint[${T - 1}] memory) public pure returns (uint) {
 assembly {
 
@@ -108,11 +108,15 @@ assembly {
     SM[x] = (state0 * BigInt(M[x][0])) % BigInt(F)
   }
 
-  f += '// load the inputs from memory\n'
+  f += '\n// load the inputs from memory'
 
-  for (let x = 0; x < T; x++) {
-    f += `let state${x}\n`
-    f += `let scratch${x}\n`
+  const defined = {}
+  const varDef = (name) => {
+    if (defined[name]) {
+      return name
+    }
+    defined[name] = true
+    return `let ${name}`
   }
 
   f += '\n'
@@ -126,27 +130,33 @@ assembly {
         if (r === 0 && y === 0 && premultiplyState0) continue
         if (r === 0 && y > 0) {
           const mem = toHex(128 + 32 * (y - 1))
-          f += `${state}${y} := addmod(mload(${mem}), ${C[r * T + y]}, F)\n`
+          f += `${varDef(`${state}${y}`)} := add(mod(mload(${mem}), F), ${
+            C[r * T + y]
+          })\n`
         } else {
-          f += `${state}${y} := addmod(${state}${y}, ${C[r * T + y]}, F)\n`
+          f += `${varDef(`${state}${y}`)} := addmod(${state}${y}, ${
+            C[r * T + y]
+          }, F)\n`
         }
       }
     }
     for (let y = 0; y < (isFRound ? T : 1); y++) {
       if (r === 0 && y === 0 && premultiplyState0) continue
-      f += `${scratch}0 := mulmod(${state}${y}, ${state}${y}, F)\n`
-      f += `${state}${y} := mulmod(mulmod(${scratch}0, ${scratch}0, F), ${state}${y}, F)\n`
+      f += `${varDef(`${scratch}0`)} := mulmod(${state}${y}, ${state}${y}, F)\n`
+      f += `${varDef(
+        `${state}${y}`
+      )} := mulmod(mulmod(${scratch}0, ${scratch}0, F), ${state}${y}, F)\n`
     }
     for (let y = 0; y < T; y++) {
       if (y > 0 && r === ROUNDS_F + ROUNDS_P - 1) break
       const m = mix(T, state, y, r === 0 && premultiplyState0 ? SM[y] : null)
       if (r < ROUNDS_F + ROUNDS_P - 1 && compressMixAdd) {
-        f += `${scratch}${y} := ${add(C[(r + 1) * T + y], m)}\n`
+        f += `${varDef(`${scratch}${y}`)} := ${add(C[(r + 1) * T + y], m)}\n`
       } else if (compressMixAdd) {
         f += '\n'
         f += `mstore(0x0, ${finalMix(T, state, y)})\n`
       } else {
-        f += `${scratch}${y} := ${m}\n`
+        f += `${varDef(`${scratch}${y}`)} := ${m}\n`
       }
     }
   }

@@ -8,28 +8,24 @@ library PoseidonT2 {
   uint constant M11 = 0x1274e649a32ed355a31a6ed69724e1adade857e86eb5c3a121bcd147943203c8;
 
   // See here for a simplified implementation: https://github.com/vimwitch/poseidon-solidity/blob/e57becdabb65d99fdc586fe1e1e09e7108202d53/contracts/Poseidon.sol#L40
-  // Based on: https://github.com/iden3/circomlibjs/blob/v0.0.8/src/poseidon_slow.js
+  // Inspired by: https://github.com/iden3/circomlibjs/blob/v0.0.8/src/poseidon_slow.js
   function hash(uint[1] memory) public pure returns (uint) {
     assembly {
       let F := 21888242871839275222246405745257275088548364400416034343698204186575808495617
-      // load the inputs from memory
-      let state0
-      let scratch0
-      let state1
-      let scratch1
 
-      state1 := addmod(mload(0x80), 0x0c0356530896eec42a97ed937f3135cfc5142b3ae405b8343c1d83ffa604cb81, F)
-      scratch0 := mulmod(state1, state1, F)
+      // load the inputs from memory
+      let state1 := add(mod(mload(0x80), F), 0x0c0356530896eec42a97ed937f3135cfc5142b3ae405b8343c1d83ffa604cb81)
+      let scratch0 := mulmod(state1, state1, F)
       state1 := mulmod(mulmod(scratch0, scratch0, F), state1, F)
       scratch0 := add(
         0x1e28a1d935698ad1142e51182bb54cf4a00ea5aabd6268bd317ea977cc154a30,
         add(2135211596334038589877319861485022046541061518379136709265746501298180122869, mulmod(state1, M10, F))
       )
-      scratch1 := add(
+      let scratch1 := add(
         0x27af2d831a9d2748080965db30e298e40e5757c3e008db964cf9e2b12b91251f,
         add(14770526369429531795265880089668477939070475643153877209429555040029415045210, mulmod(state1, M11, F))
       )
-      state0 := mulmod(scratch0, scratch0, F)
+      let state0 := mulmod(scratch0, scratch0, F)
       scratch0 := mulmod(mulmod(state0, state0, F), scratch0, F)
       state0 := mulmod(scratch1, scratch1, F)
       scratch1 := mulmod(mulmod(state0, state0, F), scratch1, F)

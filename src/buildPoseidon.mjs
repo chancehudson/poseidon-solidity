@@ -16,14 +16,22 @@ const _ROUNDS_P = [
 const F =
   '21888242871839275222246405745257275088548364400416034343698204186575808495617'
 
-const MAX_ARGS = 5
+const MAX_ARGS = 7
 
 const toHex = (n) => '0x' + BigInt(n).toString(16)
 
 const mul = (v1, v2) => `mulmod(${v1}, ${v2}, F)`
-const add = (v1, v2) => `addmod(${v1}, ${v2}, F)`
+const addmod = (v1, v2) => `addmod(${v1}, ${v2}, F)`
+const add = (v1, v2) => `add(${v1}, ${v2})`
+const mod = (v1) => `mod(${v1}, F)`
 
-const buildMixSteps = (T) => {
+const buildMixSteps = (T, options = {}) => {
+  Object.assign(
+    {
+      forceFinalMod: false,
+    },
+    options
+  )
   let f = ''
   const unusedMemOffset = 128 + 32 * (T - 2)
   for (let x = 0; x < T; x++) {
@@ -59,8 +67,17 @@ const buildMixSteps = (T) => {
     } else {
       // one addition
       let _add = add(muls.shift(), muls.shift())
+      let addCount = 2
       for (let y = 0; y < muls.length; y++) {
         _add = add(_add, muls[y])
+        addCount++
+        if (addCount === 4) {
+          _add = mod(_add)
+          addCount = 0
+        }
+      }
+      if (addCount >= 3 || options.forceFinalMod) {
+        _add = mod(_add)
       }
       f += `mstore(${mem}, ${_add})\n`
     }
@@ -92,7 +109,7 @@ uint constant F = ${F};
   f += `
 
 // See here for a simplified implementation: https://github.com/vimwitch/poseidon-solidity/blob/e57becdabb65d99fdc586fe1e1e09e7108202d53/contracts/Poseidon.sol#L40
-// Based on: https://github.com/iden3/circomlibjs/blob/v0.0.8/src/poseidon_slow.js
+// Inspired by: https://github.com/iden3/circomlibjs/blob/v0.0.8/src/poseidon_slow.js
 function hash(uint[${T - 1}] memory) public pure returns (uint) {
 assembly {
 
@@ -118,10 +135,18 @@ function pRound(${Array(Math.min(T, MAX_ARGS))
   for (let x = 0; x < T; x++) {
     const mem = x < 2 ? toHex(32 * x) : toHex(128 + 32 * (x - 2))
     if (x < MAX_ARGS) {
-      f += `let state${x} := addmod(mload(${mem}), c${x}, F)\n`
+      if (T >= 6 && x > 0) {
+        f += `let state${x} := addmod(mload(${mem}), c${x}, F)\n`
+      } else {
+        f += `let state${x} := add(mload(${mem}), c${x})\n`
+      }
     } else {
       const _mem = toHex(unusedMemOffset + 32 * (x - MAX_ARGS))
-      f += `mstore(${_mem}, addmod(mload(${mem}), mload(${_mem}), F))\n`
+      if (T >= 6 && x > 0) {
+        f += `mstore(${_mem}, addmod(mload(${mem}), mload(${_mem}), F))\n`
+      } else {
+        f += `mstore(${_mem}, add(mload(${mem}), mload(${_mem})))\n`
+      }
     }
   }
 
@@ -145,10 +170,10 @@ function fRound(${Array(Math.min(T, MAX_ARGS))
   for (let x = 0; x < T; x++) {
     const mem = x < 2 ? toHex(32 * x) : toHex(128 + 32 * (x - 2))
     if (x < MAX_ARGS) {
-      f += `let state${x} := addmod(mload(${mem}), c${x}, F)\n`
+      f += `let state${x} := ${add(`mload(${mem})`, `c${x}`)}\n`
     } else {
       const _mem = toHex(unusedMemOffset + 32 * (x - MAX_ARGS))
-      f += `mstore(${_mem}, addmod(mload(${mem}), mload(${_mem}), F))\n`
+      f += `mstore(${_mem}, ${add(`mload(${mem})`, `mload(${_mem})`)})\n`
     }
   }
 
@@ -195,12 +220,12 @@ let p
 
   for (let x = 1; x < Math.min(T, MAX_ARGS); x++) {
     const mem = toHex(128 + 32 * (x - 1))
-    f += `let state${x} := addmod(mload(${mem}), ${C[r * T + x]}, F)\n`
+    f += `let state${x} := add(mod(mload(${mem}), F), ${C[r * T + x]})\n`
   }
   for (let x = T; x >= Math.min(T, MAX_ARGS); --x) {
     const mem = toHex(128 + 32 * (x - 1))
     const _mem = toHex(unusedMemOffset + 32 * (x - MAX_ARGS))
-    f += `mstore(${_mem}, addmod(mload(${mem}), ${C[r * T + x]}, F))\n`
+    f += `mstore(${_mem}, add(mod(mload(${mem}), F), ${C[r * T + x]}))\n`
   }
 
   f += '\n'
@@ -254,10 +279,10 @@ ${func}(`
   for (let x = 0; x < T; x++) {
     const mem = x < 2 ? toHex(32 * x) : toHex(128 + 32 * (x - 2))
     if (x < MAX_ARGS) {
-      f += `let state${x} := addmod(mload(${mem}), ${C[r * T + x]}, F)\n`
+      f += `let state${x} := add(mload(${mem}), ${C[r * T + x]})\n`
     } else {
       const _mem = toHex(unusedMemOffset + 32 * (x - MAX_ARGS))
-      f += `mstore(${_mem}, addmod(mload(${mem}), ${C[r * T + x]}, F))\n`
+      f += `mstore(${_mem}, add(mload(${mem}), ${C[r * T + x]}))\n`
     }
   }
 
@@ -274,9 +299,12 @@ ${func}(`
       f += `mstore(${mem}, mulmod(mulmod(p, p, F), ${`mload(${mem})`}, F))\n`
     }
   }
-  let lastMix = buildMixSteps(T).split('\n')[0]
+  let lastMix = buildMixSteps(T, { forceFinalMod: true }).split('\n')[0]
   if (T > MAX_ARGS) {
-    lastMix = buildMixSteps(T).split('\n').slice(0, 2).join('\n')
+    lastMix = buildMixSteps(T, { forceFinalMod: true })
+      .split('\n')
+      .slice(0, 2)
+      .join('\n')
   }
 
   f += `

@@ -75,5 +75,19 @@ for (const t of T) {
         assert.equal(h.toString(), poseidon_slow(input).toString())
       }
     })
+
+    it('should check overflowed inputs', async () => {
+      const [owner] = await ethers.getSigners()
+      const Poseidon = await ethers.getContractFactory(`PoseidonT${t}`)
+      const _poseidon = await Poseidon.deploy()
+      for (let x = 0; x < 10; x++) {
+        const input = Array(t - 1)
+          .fill()
+          .map((_, i) => 2n ** 255n + BigInt(i * x))
+        const h = await _poseidon.hash(input)
+        assert.equal(h.toString(), poseidon(input).toString())
+        assert.equal(h.toString(), poseidon_slow(input).toString())
+      }
+    })
   })
 }

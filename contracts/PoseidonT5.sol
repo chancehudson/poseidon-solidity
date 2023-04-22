@@ -31,7 +31,7 @@ library PoseidonT5 {
   uint constant M44 = 0x14074bb14c982c81c9ad171e4f35fe49b39c4a7a72dbb6d9c98d803bfed65e64;
 
   // See here for a simplified implementation: https://github.com/vimwitch/poseidon-solidity/blob/e57becdabb65d99fdc586fe1e1e09e7108202d53/contracts/Poseidon.sol#L40
-  // Based on: https://github.com/iden3/circomlibjs/blob/v0.0.8/src/poseidon_slow.js
+  // Inspired by: https://github.com/iden3/circomlibjs/blob/v0.0.8/src/poseidon_slow.js
   function hash(uint[4] memory) public pure returns (uint) {
     assembly {
       // memory 0x00 to 0x3f (64 bytes) is scratch space for hash algos
@@ -49,43 +49,28 @@ library PoseidonT5 {
       // state4 - ...
 
       function pRound(c0, c1, c2, c3, c4) {
-        let state0 := addmod(mload(0x0), c0, F)
-        let state1 := addmod(mload(0x20), c1, F)
-        let state2 := addmod(mload(0x80), c2, F)
-        let state3 := addmod(mload(0xa0), c3, F)
-        let state4 := addmod(mload(0xc0), c4, F)
+        let state0 := add(mload(0x0), c0)
+        let state1 := add(mload(0x20), c1)
+        let state2 := add(mload(0x80), c2)
+        let state3 := add(mload(0xa0), c3)
+        let state4 := add(mload(0xc0), c4)
 
         let p := mulmod(state0, state0, F)
         state0 := mulmod(mulmod(p, p, F), state0, F)
 
-        mstore(
-          0x0,
-          addmod(addmod(addmod(addmod(mulmod(state0, M00, F), mulmod(state1, M10, F), F), mulmod(state2, M20, F), F), mulmod(state3, M30, F), F), mulmod(state4, M40, F), F)
-        )
-        mstore(
-          0x20,
-          addmod(addmod(addmod(addmod(mulmod(state0, M01, F), mulmod(state1, M11, F), F), mulmod(state2, M21, F), F), mulmod(state3, M31, F), F), mulmod(state4, M41, F), F)
-        )
-        mstore(
-          0x80,
-          addmod(addmod(addmod(addmod(mulmod(state0, M02, F), mulmod(state1, M12, F), F), mulmod(state2, M22, F), F), mulmod(state3, M32, F), F), mulmod(state4, M42, F), F)
-        )
-        mstore(
-          0xa0,
-          addmod(addmod(addmod(addmod(mulmod(state0, M03, F), mulmod(state1, M13, F), F), mulmod(state2, M23, F), F), mulmod(state3, M33, F), F), mulmod(state4, M43, F), F)
-        )
-        mstore(
-          0xc0,
-          addmod(addmod(addmod(addmod(mulmod(state0, M04, F), mulmod(state1, M14, F), F), mulmod(state2, M24, F), F), mulmod(state3, M34, F), F), mulmod(state4, M44, F), F)
-        )
+        mstore(0x0, add(mod(add(add(add(mulmod(state0, M00, F), mulmod(state1, M10, F)), mulmod(state2, M20, F)), mulmod(state3, M30, F)), F), mulmod(state4, M40, F)))
+        mstore(0x20, add(mod(add(add(add(mulmod(state0, M01, F), mulmod(state1, M11, F)), mulmod(state2, M21, F)), mulmod(state3, M31, F)), F), mulmod(state4, M41, F)))
+        mstore(0x80, add(mod(add(add(add(mulmod(state0, M02, F), mulmod(state1, M12, F)), mulmod(state2, M22, F)), mulmod(state3, M32, F)), F), mulmod(state4, M42, F)))
+        mstore(0xa0, add(mod(add(add(add(mulmod(state0, M03, F), mulmod(state1, M13, F)), mulmod(state2, M23, F)), mulmod(state3, M33, F)), F), mulmod(state4, M43, F)))
+        mstore(0xc0, add(mod(add(add(add(mulmod(state0, M04, F), mulmod(state1, M14, F)), mulmod(state2, M24, F)), mulmod(state3, M34, F)), F), mulmod(state4, M44, F)))
       }
 
       function fRound(c0, c1, c2, c3, c4) {
-        let state0 := addmod(mload(0x0), c0, F)
-        let state1 := addmod(mload(0x20), c1, F)
-        let state2 := addmod(mload(0x80), c2, F)
-        let state3 := addmod(mload(0xa0), c3, F)
-        let state4 := addmod(mload(0xc0), c4, F)
+        let state0 := add(mload(0x0), c0)
+        let state1 := add(mload(0x20), c1)
+        let state2 := add(mload(0x80), c2)
+        let state3 := add(mload(0xa0), c3)
+        let state4 := add(mload(0xc0), c4)
 
         let p := mulmod(state0, state0, F)
         state0 := mulmod(mulmod(p, p, F), state0, F)
@@ -98,26 +83,11 @@ library PoseidonT5 {
         p := mulmod(state4, state4, F)
         state4 := mulmod(mulmod(p, p, F), state4, F)
 
-        mstore(
-          0x0,
-          addmod(addmod(addmod(addmod(mulmod(state0, M00, F), mulmod(state1, M10, F), F), mulmod(state2, M20, F), F), mulmod(state3, M30, F), F), mulmod(state4, M40, F), F)
-        )
-        mstore(
-          0x20,
-          addmod(addmod(addmod(addmod(mulmod(state0, M01, F), mulmod(state1, M11, F), F), mulmod(state2, M21, F), F), mulmod(state3, M31, F), F), mulmod(state4, M41, F), F)
-        )
-        mstore(
-          0x80,
-          addmod(addmod(addmod(addmod(mulmod(state0, M02, F), mulmod(state1, M12, F), F), mulmod(state2, M22, F), F), mulmod(state3, M32, F), F), mulmod(state4, M42, F), F)
-        )
-        mstore(
-          0xa0,
-          addmod(addmod(addmod(addmod(mulmod(state0, M03, F), mulmod(state1, M13, F), F), mulmod(state2, M23, F), F), mulmod(state3, M33, F), F), mulmod(state4, M43, F), F)
-        )
-        mstore(
-          0xc0,
-          addmod(addmod(addmod(addmod(mulmod(state0, M04, F), mulmod(state1, M14, F), F), mulmod(state2, M24, F), F), mulmod(state3, M34, F), F), mulmod(state4, M44, F), F)
-        )
+        mstore(0x0, add(mod(add(add(add(mulmod(state0, M00, F), mulmod(state1, M10, F)), mulmod(state2, M20, F)), mulmod(state3, M30, F)), F), mulmod(state4, M40, F)))
+        mstore(0x20, add(mod(add(add(add(mulmod(state0, M01, F), mulmod(state1, M11, F)), mulmod(state2, M21, F)), mulmod(state3, M31, F)), F), mulmod(state4, M41, F)))
+        mstore(0x80, add(mod(add(add(add(mulmod(state0, M02, F), mulmod(state1, M12, F)), mulmod(state2, M22, F)), mulmod(state3, M32, F)), F), mulmod(state4, M42, F)))
+        mstore(0xa0, add(mod(add(add(add(mulmod(state0, M03, F), mulmod(state1, M13, F)), mulmod(state2, M23, F)), mulmod(state3, M33, F)), F), mulmod(state4, M43, F)))
+        mstore(0xc0, add(mod(add(add(add(mulmod(state0, M04, F), mulmod(state1, M14, F)), mulmod(state2, M24, F)), mulmod(state3, M34, F)), F), mulmod(state4, M44, F)))
       }
 
       // scratch variable for exponentiation
@@ -125,11 +95,11 @@ library PoseidonT5 {
 
       {
         // load the inputs from memory
-        let state1 := addmod(mload(0x80), 0x0554d736315b8662f02fdba7dd737fbca197aeb12ea64713ba733f28475128cb, F)
-        let state2 := addmod(mload(0xa0), 0x2f83b9df259b2b68bcd748056307c37754907df0c0fb0035f5087c58d5e8c2d4, F)
-        let state3 := addmod(mload(0xc0), 0x2ca70e2e8d7f39a12447ac83052451b461f15f8b41a75ef31915208f5aba9683, F)
-        let state4 := addmod(mload(0xe0), 0x1cb5f9319be6a45e91b04d7222271c94994196f12ed22c5d4ec719cb83ecfea9, F)
-        mstore(0xe0, addmod(mload(0x100), 0x2eb4f99c69f966ebf8a42192de7ff61621c7bb47b93750c2b9ea08d18446c122, F))
+        let state1 := add(mod(mload(0x80), F), 0x0554d736315b8662f02fdba7dd737fbca197aeb12ea64713ba733f28475128cb)
+        let state2 := add(mod(mload(0xa0), F), 0x2f83b9df259b2b68bcd748056307c37754907df0c0fb0035f5087c58d5e8c2d4)
+        let state3 := add(mod(mload(0xc0), F), 0x2ca70e2e8d7f39a12447ac83052451b461f15f8b41a75ef31915208f5aba9683)
+        let state4 := add(mod(mload(0xe0), F), 0x1cb5f9319be6a45e91b04d7222271c94994196f12ed22c5d4ec719cb83ecfea9)
+        mstore(0xa0, add(mod(mload(0x100), F), 0x2eb4f99c69f966ebf8a42192de7ff61621c7bb47b93750c2b9ea08d18446c122))
 
         p := mulmod(state1, state1, F)
         state1 := mulmod(mulmod(p, p, F), state1, F)
@@ -144,62 +114,37 @@ library PoseidonT5 {
 
         mstore(
           0x0,
-          addmod(
-            addmod(
-              addmod(addmod(0x1282bc78005ba97a80ccae28ce172790ca301e19e52354333993891b9fd27bd4, mulmod(state1, M10, F), F), mulmod(state2, M20, F), F),
-              mulmod(state3, M30, F),
-              F
-            ),
-            mulmod(state4, M40, F),
-            F
+          add(
+            mod(add(add(add(0x1282bc78005ba97a80ccae28ce172790ca301e19e52354333993891b9fd27bd4, mulmod(state1, M10, F)), mulmod(state2, M20, F)), mulmod(state3, M30, F)), F),
+            mulmod(state4, M40, F)
           )
         )
         mstore(
           0x20,
-          addmod(
-            addmod(
-              addmod(addmod(0x25ce673773c90bcab91ecf14a691cbc59aeff5abfff4cfc7c6a85d51a79468fa, mulmod(state1, M11, F), F), mulmod(state2, M21, F), F),
-              mulmod(state3, M31, F),
-              F
-            ),
-            mulmod(state4, M41, F),
-            F
+          add(
+            mod(add(add(add(0x25ce673773c90bcab91ecf14a691cbc59aeff5abfff4cfc7c6a85d51a79468fa, mulmod(state1, M11, F)), mulmod(state2, M21, F)), mulmod(state3, M31, F)), F),
+            mulmod(state4, M41, F)
           )
         )
         mstore(
           0x80,
-          addmod(
-            addmod(
-              addmod(addmod(0x2933f130a05a81186977481f40b428b2fa98c4a8f2561aad43098fb380f746b7, mulmod(state1, M12, F), F), mulmod(state2, M22, F), F),
-              mulmod(state3, M32, F),
-              F
-            ),
-            mulmod(state4, M42, F),
-            F
+          add(
+            mod(add(add(add(0x2933f130a05a81186977481f40b428b2fa98c4a8f2561aad43098fb380f746b7, mulmod(state1, M12, F)), mulmod(state2, M22, F)), mulmod(state3, M32, F)), F),
+            mulmod(state4, M42, F)
           )
         )
         mstore(
           0xa0,
-          addmod(
-            addmod(
-              addmod(addmod(0x178f5c848248d8ae30d9d4e6c27ec06995bba97b9d0ab13bb7b63e121958133e, mulmod(state1, M13, F), F), mulmod(state2, M23, F), F),
-              mulmod(state3, M33, F),
-              F
-            ),
-            mulmod(state4, M43, F),
-            F
+          add(
+            mod(add(add(add(0x178f5c848248d8ae30d9d4e6c27ec06995bba97b9d0ab13bb7b63e121958133e, mulmod(state1, M13, F)), mulmod(state2, M23, F)), mulmod(state3, M33, F)), F),
+            mulmod(state4, M43, F)
           )
         )
         mstore(
           0xc0,
-          addmod(
-            addmod(
-              addmod(addmod(0x1f52dac6047456323348e214a18a3aad024561b12c7ca045cd2484b9d4ffe3c0, mulmod(state1, M14, F), F), mulmod(state2, M24, F), F),
-              mulmod(state3, M34, F),
-              F
-            ),
-            mulmod(state4, M44, F),
-            F
+          add(
+            mod(add(add(add(0x1f52dac6047456323348e214a18a3aad024561b12c7ca045cd2484b9d4ffe3c0, mulmod(state1, M14, F)), mulmod(state2, M24, F)), mulmod(state3, M34, F)), F),
+            mulmod(state4, M44, F)
           )
         )
       }
@@ -733,11 +678,11 @@ library PoseidonT5 {
       )
 
       {
-        let state0 := addmod(mload(0x0), 0x2036efb6f9830965eb3d7a068bd087c9f5adf251ba62052c652738e63ff8b3af, F)
-        let state1 := addmod(mload(0x20), 0x0c712a975b74dc9d766b639a029969ca30be4f75a753f854b00fa4f1b4f4ee9b, F)
-        let state2 := addmod(mload(0x80), 0x08014dab3cd1667e27afc99bfac1e6807afdff6456492ca3375731d387539699, F)
-        let state3 := addmod(mload(0xa0), 0x198d07192db4fac2a82a4a79839d6a2b97c4dd4d37b4e8f3b53009f79b34e6a4, F)
-        let state4 := addmod(mload(0xc0), 0x29eb1de42a3ad381b23b4131426897a32709b29d53bb946dfd15784d1f63e572, F)
+        let state0 := add(mload(0x0), 0x2036efb6f9830965eb3d7a068bd087c9f5adf251ba62052c652738e63ff8b3af)
+        let state1 := add(mload(0x20), 0x0c712a975b74dc9d766b639a029969ca30be4f75a753f854b00fa4f1b4f4ee9b)
+        let state2 := add(mload(0x80), 0x08014dab3cd1667e27afc99bfac1e6807afdff6456492ca3375731d387539699)
+        let state3 := add(mload(0xa0), 0x198d07192db4fac2a82a4a79839d6a2b97c4dd4d37b4e8f3b53009f79b34e6a4)
+        let state4 := add(mload(0xc0), 0x29eb1de42a3ad381b23b4131426897a32709b29d53bb946dfd15784d1f63e572)
 
         p := mulmod(state0, state0, F)
         state0 := mulmod(mulmod(p, p, F), state0, F)
@@ -750,10 +695,7 @@ library PoseidonT5 {
         p := mulmod(state4, state4, F)
         state4 := mulmod(mulmod(p, p, F), state4, F)
 
-        mstore(
-          0x0,
-          addmod(addmod(addmod(addmod(mulmod(state0, M00, F), mulmod(state1, M10, F), F), mulmod(state2, M20, F), F), mulmod(state3, M30, F), F), mulmod(state4, M40, F), F)
-        )
+        mstore(0x0, mod(add(mod(add(add(add(mulmod(state0, M00, F), mulmod(state1, M10, F)), mulmod(state2, M20, F)), mulmod(state3, M30, F)), F), mulmod(state4, M40, F)), F))
         return(0, 0x20)
       }
     }

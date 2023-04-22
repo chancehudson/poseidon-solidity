@@ -10,24 +10,18 @@ library PoseidonT3 {
   uint constant M12 = 0x176cc029695ad02582a70eff08a6fd99d057e12e58e7d7b6b16cdfabc8ee2911;
 
   // See here for a simplified implementation: https://github.com/vimwitch/poseidon-solidity/blob/e57becdabb65d99fdc586fe1e1e09e7108202d53/contracts/Poseidon.sol#L40
-  // Based on: https://github.com/iden3/circomlibjs/blob/v0.0.8/src/poseidon_slow.js
+  // Inspired by: https://github.com/iden3/circomlibjs/blob/v0.0.8/src/poseidon_slow.js
   function hash(uint[2] memory) public pure returns (uint) {
     assembly {
       let F := 21888242871839275222246405745257275088548364400416034343698204186575808495617
       let M20 := 0x2b90bba00fca0589f617e7dcbfe82e0df706ab640ceb247b791a93b74e36736d
       let M21 := 0x101071f0032379b697315876690f053d148d4e109f5fb065c8aacc55a0f89bfa
       let M22 := 0x19a3fc0a56702bf417ba7fee3802593fa644470307043f7773279cd71d25d5e0
-      // load the inputs from memory
-      let state0
-      let scratch0
-      let state1
-      let scratch1
-      let state2
-      let scratch2
 
-      state1 := addmod(mload(0x80), 0x00f1445235f2148c5986587169fc1bcd887b08d4d00868df5696fff40956e864, F)
-      state2 := addmod(mload(0xa0), 0x08dff3487e8ac99e1f29a058d0fa80b930c728730b7ab36ce879f3890ecf73f5, F)
-      scratch0 := mulmod(state1, state1, F)
+      // load the inputs from memory
+      let state1 := add(mod(mload(0x80), F), 0x00f1445235f2148c5986587169fc1bcd887b08d4d00868df5696fff40956e864)
+      let state2 := add(mod(mload(0xa0), F), 0x08dff3487e8ac99e1f29a058d0fa80b930c728730b7ab36ce879f3890ecf73f5)
+      let scratch0 := mulmod(state1, state1, F)
       state1 := mulmod(mulmod(scratch0, scratch0, F), state1, F)
       scratch0 := mulmod(state2, state2, F)
       state2 := mulmod(mulmod(scratch0, scratch0, F), state2, F)
@@ -35,15 +29,15 @@ library PoseidonT3 {
         0x2f27be690fdaee46c3ce28f7532b13c856c35342c84bda6e20966310fadc01d0,
         add(add(15452833169820924772166449970675545095234312153403844297388521437673434406763, mulmod(state1, M10, F)), mulmod(state2, M20, F))
       )
-      scratch1 := add(
+      let scratch1 := add(
         0x2b2ae1acf68b7b8d2416bebf3d4f6234b763fe04b8043ee48b8327bebca16cf2,
         add(add(18674271267752038776579386132900109523609358935013267566297499497165104279117, mulmod(state1, M11, F)), mulmod(state2, M21, F))
       )
-      scratch2 := add(
+      let scratch2 := add(
         0x0319d062072bef7ecca5eac06f97d4d55952c175ab6b03eae64b44c7dbf11cfa,
         add(add(14817777843080276494683266178512808687156649753153012854386334860566696099579, mulmod(state1, M12, F)), mulmod(state2, M22, F))
       )
-      state0 := mulmod(scratch0, scratch0, F)
+      let state0 := mulmod(scratch0, scratch0, F)
       scratch0 := mulmod(mulmod(state0, state0, F), scratch0, F)
       state0 := mulmod(scratch1, scratch1, F)
       scratch1 := mulmod(mulmod(state0, state0, F), scratch1, F)
