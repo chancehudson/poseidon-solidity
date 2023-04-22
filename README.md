@@ -6,7 +6,7 @@ Poseidon implementation in Solidity over alt_bn128 (aka BN254).
 
 ## Benchmark
 
-```
+```yaml
 Hash cost (T2)
   - poseidon-solidity: 13,488 gas
   - circomlibjs: 19,395 gas
